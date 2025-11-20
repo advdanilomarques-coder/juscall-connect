@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MapPin, Shield, Clock, MessageSquare, Scale } from "lucide-react";
+import { MapPin, Shield, Clock, FileText, Users, Calculator, Briefcase, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-legal-app.jpg";
 
@@ -93,6 +93,100 @@ const Landing = () => {
               <h4 className="text-xl font-semibold">Seguro e Regulamentado</h4>
               <p className="text-muted-foreground">
                 Todos os advogados são validados pela OAB. Conexão criptografada e segura.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4">Serviços Jurídicos Disponíveis</h3>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Nossa rede de advogados oferece diversos serviços para atender suas necessidades jurídicas
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Briefcase className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold">Audiências</h4>
+              <p className="text-sm text-muted-foreground">
+                Representação em audiências trabalhistas, criminais, cíveis e de família.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-secondary/10 flex items-center justify-center">
+                <MapPin className="h-7 w-7 text-secondary" />
+              </div>
+              <h4 className="text-lg font-semibold">Diligências</h4>
+              <p className="text-sm text-muted-foreground">
+                Acompanhamento em delegacias, cartórios e órgãos públicos.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-accent/10 flex items-center justify-center">
+                <Users className="h-7 w-7 text-accent" />
+              </div>
+              <h4 className="text-lg font-semibold">Correspondente Jurídico</h4>
+              <p className="text-sm text-muted-foreground">
+                Atuação como correspondente em processos de outras comarcas.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Calculator className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold">Cálculos Jurídicos</h4>
+              <p className="text-sm text-muted-foreground">
+                Cálculos trabalhistas, previdenciários e de liquidação de sentença.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-secondary/10 flex items-center justify-center">
+                <FileText className="h-7 w-7 text-secondary" />
+              </div>
+              <h4 className="text-lg font-semibold">Elaboração de Petições</h4>
+              <p className="text-sm text-muted-foreground">
+                Petições iniciais, recursos, contestações e memoriais.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-accent/10 flex items-center justify-center">
+                <Shield className="h-7 w-7 text-accent" />
+              </div>
+              <h4 className="text-lg font-semibold">Atendimento em Flagrante</h4>
+              <p className="text-sm text-muted-foreground">
+                Atendimento emergencial em casos de prisão em flagrante.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FileText className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold">Consultoria Jurídica</h4>
+              <p className="text-sm text-muted-foreground">
+                Orientações preventivas e análise de documentos contratuais.
+              </p>
+            </Card>
+
+            <Card className="p-6 space-y-3 hover:shadow-trust transition-all hover:-translate-y-1">
+              <div className="h-14 w-14 rounded-xl bg-secondary/10 flex items-center justify-center">
+                <Scale className="h-7 w-7 text-secondary" />
+              </div>
+              <h4 className="text-lg font-semibold">Mediação e Conciliação</h4>
+              <p className="text-sm text-muted-foreground">
+                Resolução extrajudicial de conflitos e acordos.
               </p>
             </Card>
           </div>
