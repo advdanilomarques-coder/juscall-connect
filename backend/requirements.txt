@@ -1,0 +1,26 @@
+# ============================================================================
+# DEPENDÊNCIAS DO PROJETO — MARQUES IA (Backend)
+# ----------------------------------------------------------------------------
+# Cada dependência tem uma única responsabilidade. Versões fixadas (pinned)
+# garantem builds reproduzíveis em qualquer máquina/servidor.
+# ============================================================================
+
+# --- Framework web assíncrono (API REST + webhooks do WhatsApp) ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# --- Configuração por variáveis de ambiente (.env), com validação de tipos ---
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# --- SDKs oficiais dos provedores de IA (Camada AI Provider) ---
+anthropic==0.42.0        # Modelo principal: Claude
+openai==1.59.6           # Modelo secundário/failover: GPT
+
+# --- Cliente HTTP assíncrono (usado por provedores REST genéricos) ---
+httpx==0.28.1
+
+# --- Testes automatizados ---
+pytest==8.3.4
+pytest-asyncio==0.25.2
