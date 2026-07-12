@@ -41,8 +41,9 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o"
     ai_max_tokens: int = 1024
 
-    # --- Banco de dados (usado nas próximas etapas) ---
-    database_url: str = ""
+    # --- Banco de dados (memória persistente) ---
+    # Padrão SQLite local; em produção use PostgreSQL via .env.
+    database_url: str = "sqlite+aiosqlite:///./storage/marques_ia.db"
 
     # --- Logs ---
     log_level: str = "INFO"

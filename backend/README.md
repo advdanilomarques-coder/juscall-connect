@@ -1,10 +1,16 @@
-# Marques IA — Backend (Etapa 1: Ambiente + Camada de IA)
+# Marques IA — Backend
 
-Sistema de IA jurídica para atendimento via WhatsApp. Esta é a **primeira
-etapa**: montamos o ambiente profissional em Python e a peça central da
-arquitetura — a **Camada de Abstração de IA** (com failover automático entre
-modelos). As próximas etapas (WhatsApp, CRM, PostgreSQL) serão construídas
-sobre esta fundação.
+Sistema de IA jurídica para atendimento via WhatsApp.
+
+- **Etapa 1 — Ambiente + Camada de IA:** fundação em Python + Camada de
+  Abstração de IA com failover automático (Claude principal, GPT reserva).
+- **Etapa 2 — Memória Persistente + Leads (CRM base):** o agente lembra de
+  tudo. Histórico, leads e conversas são salvos no banco, de forma
+  **independente do modelo de IA**. Arquitetura preparada para PostgreSQL
+  (SQLite como padrão local).
+
+As próximas etapas (WhatsApp, contratos, painel) serão construídas sobre esta
+fundação.
 
 ---
 
@@ -46,19 +52,30 @@ backend/
 │   │   ├── logging.py      # Logs estruturados
 │   │   └── exceptions.py   # Exceções de domínio
 │   │
-│   └── ai/                 # CAMADA DE ABSTRAÇÃO DE IA (o coração)
+│   ├── ai/                 # CAMADA DE ABSTRAÇÃO DE IA (o coração)
+│   │   ├── __init__.py
+│   │   ├── schemas.py      # Contratos de entrada/saída padronizados
+│   │   ├── base.py         # Interface abstrata AIProvider
+│   │   ├── manager.py      # AIManager: orquestra provedores + failover
+│   │   └── providers/      # Implementações concretas
+│   │       ├── __init__.py
+│   │       ├── claude_provider.py   # Modelo principal (Claude)
+│   │       └── openai_provider.py   # Modelo reserva (GPT)
+│   │
+│   ├── db/                 # PERSISTÊNCIA (memória do agente)
+│   │   ├── __init__.py
+│   │   ├── base.py         # Engine, sessões e init_db (SQLite/PostgreSQL)
+│   │   └── models.py       # Tabelas: Lead, Conversation, Message
+│   │
+│   └── memory/             # CAMADA DE MEMÓRIA (une banco + IA)
 │       ├── __init__.py
-│       ├── schemas.py      # Contratos de entrada/saída padronizados
-│       ├── base.py         # Interface abstrata AIProvider
-│       ├── manager.py      # AIManager: orquestra provedores + failover
-│       └── providers/      # Implementações concretas
-│           ├── __init__.py
-│           ├── claude_provider.py   # Modelo principal (Claude)
-│           └── openai_provider.py   # Modelo reserva (GPT)
+│       ├── repository.py   # Acesso ao banco (padrão Repository)
+│       └── service.py      # MemoryService: histórico + IA + persistência
 │
 └── tests/                  # Testes automatizados
     ├── __init__.py
-    └── test_ai_manager.py  # Testa o failover sem gastar tokens
+    ├── test_ai_manager.py  # Testa o failover sem gastar tokens
+    └── test_memory.py      # Testa a persistência e o crescimento do histórico
 ```
 
 ### Por que essa organização?
@@ -156,12 +173,12 @@ curl http://127.0.0.1:8000/
 curl http://127.0.0.1:8000/initial-message
 ```
 
-**Conversar com o agente:**
+**Conversar com o agente (com memória — o `phone` identifica o cliente):**
 
 ```bash
 curl -X POST http://127.0.0.1:8000/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "Meu carro foi apreendido, o que eu faço?"}'
+  -d '{"phone": "5511987654321", "message": "Meu carro foi apreendido, o que faço?"}'
 ```
 
 Resposta (exemplo):
@@ -173,6 +190,9 @@ Resposta (exemplo):
   "model": "claude-opus-4-8"
 }
 ```
+
+Envie novas mensagens com o **mesmo `phone`**: o agente lembra do histórico e
+continua de onde parou (memória persistida no banco).
 
 ---
 
@@ -200,11 +220,32 @@ Isso é o Princípio Aberto/Fechado do SOLID na prática.
 
 ---
 
-## 8. Próximas etapas do projeto
+## 8. Memória persistente (Etapa 2)
 
-- [ ] Memória persistente (PostgreSQL) — histórico independente do modelo.
+O agente lembra de cada cliente, identificado pelo telefone:
+
+- **`Lead`** — dados cadastrais e o status no funil do CRM (Novo Lead,
+  Primeiro Atendimento, Análise Jurídica...).
+- **`Conversation`** — o atendimento (thread) do lead.
+- **`Message`** — cada mensagem, com metadados de custo (provedor, modelo,
+  tokens) para o controle no painel administrativo.
+
+Pontos-chave da arquitetura:
+
+- A memória é **independente do modelo de IA** — o failover (Claude → GPT)
+  nunca faz o agente esquecer o histórico.
+- A mensagem do cliente é salva **antes** de chamar a IA; se a IA falhar, a
+  memória é preservada e o cliente recebe um fallback amigável.
+- **Padrão Repository** isola o acesso ao banco: trocar SQLite por PostgreSQL
+  é só mudar a `DATABASE_URL` no `.env`.
+- O banco é criado automaticamente no startup (não precisa migração manual
+  nesta fase; migrações formais com Alembic entram em uma etapa futura).
+
+## 9. Próximas etapas do projeto
+
 - [ ] Webhook do WhatsApp Business + QR Code de conexão.
-- [ ] CRM (leads, funil, contratos, documentos).
+- [ ] CRM completo (funil visual, contratos, documentos).
 - [ ] Geração automática de contratos em PDF.
 - [ ] Painel administrativo e controle de custos por tokens.
+- [ ] Migrações de banco com Alembic.
 - [ ] Segurança (JWT, LGPD, rate limit).

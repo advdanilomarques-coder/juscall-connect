@@ -21,6 +21,14 @@ openai==1.59.6           # Modelo secundário/failover: GPT
 # --- Cliente HTTP assíncrono (usado por provedores REST genéricos) ---
 httpx==0.28.1
 
+# --- Banco de dados / ORM (memória persistente) ---
+# SQLAlchemy async funciona tanto com PostgreSQL (asyncpg) quanto com
+# SQLite (aiosqlite). Trocar de banco = trocar apenas a DATABASE_URL.
+sqlalchemy==2.0.36
+aiosqlite==0.20.0        # driver SQLite (padrão local/desenvolvimento)
+asyncpg==0.30.0          # driver PostgreSQL (produção)
+greenlet==3.1.1          # requisito do modo assíncrono do SQLAlchemy
+
 # --- Testes automatizados ---
 pytest==8.3.4
 pytest-asyncio==0.25.2
