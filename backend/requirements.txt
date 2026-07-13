@@ -26,8 +26,13 @@ httpx==0.28.1
 # SQLite (aiosqlite). Trocar de banco = trocar apenas a DATABASE_URL.
 sqlalchemy==2.0.36
 aiosqlite==0.20.0        # driver SQLite (padrão local/desenvolvimento)
-asyncpg==0.30.0          # driver PostgreSQL (produção)
 greenlet==3.1.1          # requisito do modo assíncrono do SQLAlchemy
+
+# --- PostgreSQL (produção) — OPCIONAL ---
+# O asyncpg só é necessário quando você usar PostgreSQL. Ele exige
+# compilação e pode travar em alguns Macs. Para desenvolvimento local com
+# SQLite, NÃO é preciso. Descomente a linha abaixo apenas em produção:
+# asyncpg==0.30.0
 
 # --- Testes automatizados ---
 pytest==8.3.4
