@@ -33,12 +33,15 @@ class Settings(BaseSettings):
     # --- Chaves das APIs de IA ---
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    gemini_api_key: str = ""
 
     # --- Seleção e ordem de failover dos provedores de IA ---
     # Ex.: "claude,openai" — o primeiro é o principal; os demais são reserva.
-    ai_provider_order: str = "claude,openai"
+    # Para usar a opção GRATUITA, defina: AI_PROVIDER_ORDER="gemini"
+    ai_provider_order: str = "claude,gemini,openai"
     claude_model: str = "claude-opus-4-8"
     openai_model: str = "gpt-4o"
+    gemini_model: str = "gemini-2.5-flash"
     ai_max_tokens: int = 1024
 
     # --- Banco de dados (memória persistente) ---

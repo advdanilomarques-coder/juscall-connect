@@ -23,12 +23,13 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 
 # --- Configuração por variáveis de ambiente (.env), com validação de tipos ---
-pydantic==2.10.4
+pydantic==2.13.4
 pydantic-settings==2.7.1
 python-dotenv==1.0.1
 
 # --- SDKs oficiais dos provedores de IA (Camada AI Provider) ---
-anthropic==0.42.0        # Modelo principal: Claude
+anthropic==0.42.0        # Modelo principal: Claude (pago)
+google-genai==2.12.1     # Gemini (Google): opção GRATUITA
 openai==1.59.6           # Modelo secundário/failover: GPT
 
 # --- Cliente HTTP assíncrono (usado por provedores REST genéricos) ---
@@ -68,19 +69,26 @@ APP_ENV="development"          # development | production
 DEBUG="true"
 
 # --- Chaves das APIs de IA (Camada AI Provider) ---
-# Modelo principal (Claude / Anthropic)
+# Modelo principal (Claude / Anthropic) — pago
 ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxx"
 
-# Modelo secundário / failover (GPT / OpenAI) — opcional
+# Gemini (Google) — GRATUITO. Pegue a chave em: https://aistudio.google.com/apikey
+GEMINI_API_KEY="AIzaxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Modelo de failover (GPT / OpenAI) — opcional
 OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
 
 # --- Seleção e ordem de failover dos modelos ---
 # O sistema tenta os provedores nesta ordem. Se o primeiro falhar,
 # alterna automaticamente para o próximo (sem o cliente perceber).
-AI_PROVIDER_ORDER="claude,openai"
+#
+# Para usar SÓ a opção GRATUITA (Gemini), deixe assim:
+#   AI_PROVIDER_ORDER="gemini"
+AI_PROVIDER_ORDER="claude,gemini,openai"
 
 # Modelos específicos por provedor
 CLAUDE_MODEL="claude-opus-4-8"
+GEMINI_MODEL="gemini-2.5-flash"
 OPENAI_MODEL="gpt-4o"
 
 # --- Parâmetros de geração ---
@@ -218,12 +226,15 @@ class Settings(BaseSettings):
     # --- Chaves das APIs de IA ---
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    gemini_api_key: str = ""
 
     # --- Seleção e ordem de failover dos provedores de IA ---
     # Ex.: "claude,openai" — o primeiro é o principal; os demais são reserva.
-    ai_provider_order: str = "claude,openai"
+    # Para usar a opção GRATUITA, defina: AI_PROVIDER_ORDER="gemini"
+    ai_provider_order: str = "claude,gemini,openai"
     claude_model: str = "claude-opus-4-8"
     openai_model: str = "gpt-4o"
+    gemini_model: str = "gemini-2.5-flash"
     ai_max_tokens: int = 1024
 
     # --- Banco de dados (memória persistente) ---
@@ -600,6 +611,96 @@ class OpenAIProvider(AIProvider):
         )
 MARQUES_IA_EOF
 
+cat > 'app/ai/providers/gemini_provider.py' << 'MARQUES_IA_EOF'
+"""Provedor de IA: Gemini (Google) — opção GRATUITA.
+
+Implementa a interface `AIProvider` usando o SDK oficial do Google (google-genai).
+O Gemini possui uma cota gratuita generosa, ideal para desenvolvimento e testes
+sem custo. Graças à camada de abstração, ele se encaixa no sistema exatamente
+como o Claude e o GPT — sem alterar CRM, memória ou atendimento.
+"""
+
+from __future__ import annotations
+
+from google import genai
+from google.genai import types
+
+from app.ai.base import AIProvider
+from app.ai.schemas import AIMessage, AIResponse, Role
+from app.core.config import settings
+from app.core.exceptions import AIProviderError
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+class GeminiProvider(AIProvider):
+    """Provedor que conversa com os modelos Gemini do Google."""
+
+    name = "gemini"
+
+    def __init__(self) -> None:
+        self._api_key = settings.gemini_api_key
+        self._model = settings.gemini_model
+        # Só cria o cliente se houver chave; caso contrário fica indisponível.
+        self._client = (
+            genai.Client(api_key=self._api_key) if self._api_key else None
+        )
+
+    def is_available(self) -> bool:
+        """Só está disponível se houver chave de API configurada."""
+        return self._client is not None
+
+    async def generate(
+        self,
+        messages: list[AIMessage],
+        *,
+        system: str | None = None,
+        max_tokens: int = 1024,
+    ) -> AIResponse:
+        if self._client is None:
+            raise AIProviderError("Gemini sem GEMINI_API_KEY configurada.")
+
+        # Converte o histórico padronizado para o formato do Gemini.
+        # No Gemini os papéis são "user" e "model" (não "assistant").
+        contents: list[types.Content] = []
+        for m in messages:
+            if m.role == Role.SYSTEM:
+                continue  # a instrução de sistema vai no config, separada
+            role = "user" if m.role == Role.USER else "model"
+            contents.append(
+                types.Content(role=role, parts=[types.Part(text=m.content)])
+            )
+
+        config = types.GenerateContentConfig(
+            max_output_tokens=max_tokens,
+            system_instruction=system or None,
+        )
+
+        try:
+            response = await self._client.aio.models.generate_content(
+                model=self._model,
+                contents=contents,
+                config=config,
+            )
+        except Exception as exc:  # noqa: BLE001 (qualquer falha aciona o failover)
+            logger.warning("Falha no provedor Gemini: %s", exc)
+            raise AIProviderError(f"Gemini falhou: {exc}") from exc
+
+        # Metadados de uso (podem não vir em todos os casos).
+        usage = response.usage_metadata
+        input_tokens = getattr(usage, "prompt_token_count", 0) or 0
+        output_tokens = getattr(usage, "candidates_token_count", 0) or 0
+
+        return AIResponse(
+            content=response.text or "",
+            provider=self.name,
+            model=self._model,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+MARQUES_IA_EOF
+
 cat > 'app/ai/manager.py' << 'MARQUES_IA_EOF'
 """Gerenciador de IA (AIManager) — orquestra os provedores com failover.
 
@@ -616,6 +717,7 @@ from __future__ import annotations
 
 from app.ai.base import AIProvider
 from app.ai.providers.claude_provider import ClaudeProvider
+from app.ai.providers.gemini_provider import GeminiProvider
 from app.ai.providers.openai_provider import OpenAIProvider
 from app.ai.schemas import AIMessage, AIResponse
 from app.core.config import settings
@@ -628,6 +730,7 @@ logger = get_logger(__name__)
 # implementar um Provider e registrá-lo aqui (mais o nome no AI_PROVIDER_ORDER).
 _PROVIDER_REGISTRY: dict[str, type[AIProvider]] = {
     "claude": ClaudeProvider,
+    "gemini": GeminiProvider,
     "openai": OpenAIProvider,
 }
 

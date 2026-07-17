@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from app.ai.base import AIProvider
 from app.ai.providers.claude_provider import ClaudeProvider
+from app.ai.providers.gemini_provider import GeminiProvider
 from app.ai.providers.openai_provider import OpenAIProvider
 from app.ai.schemas import AIMessage, AIResponse
 from app.core.config import settings
@@ -25,6 +26,7 @@ logger = get_logger(__name__)
 # implementar um Provider e registrá-lo aqui (mais o nome no AI_PROVIDER_ORDER).
 _PROVIDER_REGISTRY: dict[str, type[AIProvider]] = {
     "claude": ClaudeProvider,
+    "gemini": GeminiProvider,
     "openai": OpenAIProvider,
 }
 
