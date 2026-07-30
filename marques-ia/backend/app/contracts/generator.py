@@ -13,11 +13,25 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 
 from app.contracts.templates import TEMPLATES
 
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "storage", "contratos")
+
+# Dados do escritório usados no cabeçalho e nos contratos.
+NOME_ESCRITORIO = "Marques Advogados Associados"
+CIDADE_PADRAO = "São Paulo/SP"  # troque pela comarca do escritório, se desejar.
+
+_MESES = [
+    "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+    "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+]
+
+
+def _data_por_extenso() -> str:
+    hoje = datetime.now(timezone.utc)
+    return f"{hoje.day} de {_MESES[hoje.month - 1]} de {hoje.year}"
 
 
 def _garantir_diretorio() -> None:
@@ -54,6 +68,8 @@ def gerar_pdf_contrato(
         nome_cliente=nome_cliente or "Cliente não identificado",
         numero_caso=numero_caso,
         resumo_caso=resumo_caso or "não informado",
+        data_extenso=_data_por_extenso(),
+        cidade=CIDADE_PADRAO,
     )
 
     styles = getSampleStyleSheet()
@@ -65,6 +81,18 @@ def gerar_pdf_contrato(
         name="TituloContrato", fontName="Helvetica-Bold", fontSize=14,
         leading=18, spaceAfter=18,
     ))
+    styles.add(ParagraphStyle(
+        name="Escritorio", fontName="Helvetica-Bold", fontSize=15,
+        leading=18, alignment=TA_CENTER, spaceAfter=2,
+    ))
+    styles.add(ParagraphStyle(
+        name="EscritorioSub", fontName="Helvetica", fontSize=9,
+        leading=12, alignment=TA_CENTER, textColor="#666666", spaceAfter=16,
+    ))
+    styles.add(ParagraphStyle(
+        name="Assinatura", fontName="Helvetica", fontSize=10,
+        leading=14, alignment=TA_CENTER,
+    ))
 
     doc = SimpleDocTemplate(
         caminho_completo, pagesize=A4,
@@ -73,6 +101,8 @@ def gerar_pdf_contrato(
     )
 
     story = [
+        Paragraph(NOME_ESCRITORIO, styles["Escritorio"]),
+        Paragraph("Advocacia — Direito Bancário e Cível", styles["EscritorioSub"]),
         Paragraph(template["titulo"], styles["TituloContrato"]),
         Paragraph(f"Contrato nº {numero}", styles["Normal"]),
         Spacer(1, 16),
@@ -81,11 +111,19 @@ def gerar_pdf_contrato(
     for paragrafo in corpo_preenchido.split("\n\n"):
         story.append(Paragraph(paragrafo.replace("\n", "<br/>"), styles["CorpoContrato"]))
 
-    story.append(Spacer(1, 36))
+    # Campos de assinatura.
+    story.append(Spacer(1, 44))
+    story.append(Paragraph("_______________________________________", styles["Assinatura"]))
+    story.append(Paragraph(f"{nome_cliente or 'CONTRATANTE'}<br/>CONTRATANTE", styles["Assinatura"]))
+    story.append(Spacer(1, 28))
+    story.append(Paragraph("_______________________________________", styles["Assinatura"]))
+    story.append(Paragraph(f"{NOME_ESCRITORIO}<br/>CONTRATADO", styles["Assinatura"]))
+
+    story.append(Spacer(1, 30))
     story.append(Paragraph(
-        "Este documento é um RASCUNHO gerado automaticamente e requer revisão e aprovação "
-        "de um advogado responsável antes de qualquer envio ao cliente.",
-        styles["Normal"],
+        "Documento gerado automaticamente e sujeito a revisão e aprovação do advogado "
+        "responsável antes de qualquer envio ao cliente.",
+        styles["EscritorioSub"],
     ))
 
     doc.build(story)
