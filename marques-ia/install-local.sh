@@ -58,4 +58,7 @@ echo "Painel/API disponivel em: http://localhost:8000/painel"
 echo "Login padrao: veja ADMIN_DEFAULT_EMAIL / ADMIN_DEFAULT_PASSWORD no seu .env"
 echo "-------------------------------------------------------"
 
-cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Roda a partir da raiz do projeto (onde esta o .env) e usa --app-dir para
+# localizar o pacote 'app' dentro de backend/. Rodar de dentro de backend/
+# faria o Pydantic nao encontrar o .env (que fica um nivel acima).
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend
