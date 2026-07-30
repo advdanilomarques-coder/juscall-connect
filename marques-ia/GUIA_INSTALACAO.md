@@ -18,7 +18,27 @@ necessário em nenhuma etapa.
 
 ---
 
-## Parte 2 — Instalação do backend, comando por comando
+## Atalho — Instalação SEM Docker (recomendado para começar)
+
+Se você **não tem Docker** (ou só quer rodar rápido no seu computador), use o
+instalador local. Ele usa **SQLite** (um único arquivo de banco, `marques_ia.db`)
+no lugar do PostgreSQL, e **não precisa** de Docker nem Redis. Tudo o mais
+(login, painel, IA, WhatsApp, contratos, e-mail) funciona igual.
+
+```bash
+cd marques-ia
+cp .env.example .env      # (ou use o .env já preenchido que você recebeu)
+# cole sua chave da OpenRouter no .env (linha OPENROUTER_API_KEY)
+chmod +x install-local.sh
+./install-local.sh
+```
+
+Pronto: acesse `http://localhost:8000/painel`. Use o Docker (Parte 2 abaixo)
+só quando for para produção / vários usuários simultâneos.
+
+---
+
+## Parte 2 — Instalação do backend com Docker (para produção)
 
 **Pré-requisitos:** Python 3.11+, Docker Desktop instalado e **aberto**.
 
