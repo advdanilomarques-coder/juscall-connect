@@ -1,0 +1,71 @@
+{
+  "name": "Marques IA - Notificacao de Novo Caso",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 15 }] }
+      },
+      "id": "trigger-schedule",
+      "name": "A cada 15 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/crm/kanban",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "buscar-kanban",
+      "name": "Buscar Kanban",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": { "id": "marques-ia-token", "name": "Marques IA - Token Admin" }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filtra apenas a coluna 'novo_lead' e retorna um item por caso\nconst colunas = $input.first().json;\nconst novoLead = colunas.find(c => c.etapa === 'novo_lead');\nreturn (novoLead ? novoLead.casos : []).map(caso => ({ json: caso }));"
+      },
+      "id": "extrair-novos-leads",
+      "name": "Extrair Novos Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sistema@marquesadvogados.com.br",
+        "toEmail": "equipe@marquesadvogados.com.br",
+        "subject": "=Novo lead recebido — Caso #{{$json.id}}",
+        "text": "=Um novo cliente entrou em contato e está aguardando qualificação.\n\nÁrea jurídica: {{$json.area_juridica}}\nResumo: {{$json.resumo || 'não informado'}}\n\nAcesse o painel: http://localhost:8000/painel"
+      },
+      "id": "enviar-email",
+      "name": "Enviar E-mail para a Equipe",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300],
+      "credentials": {
+        "smtp": { "id": "smtp-escritorio", "name": "SMTP do Escritório" }
+      }
+    }
+  ],
+  "connections": {
+    "A cada 15 minutos": {
+      "main": [[{ "node": "Buscar Kanban", "type": "main", "index": 0 }]]
+    },
+    "Buscar Kanban": {
+      "main": [[{ "node": "Extrair Novos Leads", "type": "main", "index": 0 }]]
+    },
+    "Extrair Novos Leads": {
+      "main": [[{ "node": "Enviar E-mail para a Equipe", "type": "main", "index": 0 }]]
+    }
+  },
+  "meta": {
+    "descricao": "Verifica a cada 15 minutos se há novos leads na etapa 'novo_lead' do kanban e envia e-mail para a equipe. Requer credencial SMTP configurada como 'SMTP do Escritório'. Para evitar e-mails duplicados em produção, recomenda-se adicionar um nó de deduplicação (ex.: comparando com um registro dos IDs já notificados)."
+  }
+}

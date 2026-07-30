@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marques IA — Painel</title>
+<style>
+  :root {
+    --navy: #12233d;
+    --gold: #b8935a;
+    --bg: #f4f6f9;
+    --line: #d9dee6;
+    --text: #232a33;
+    --green: #1f7a4d;
+    --red: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  header {
+    background: var(--navy); color: white; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  header .gold { color: var(--gold); }
+  #btn-sair { background: transparent; border: 1px solid #ffffff55; color: white;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; }
+
+  #tela-login {
+    max-width: 360px; margin: 80px auto; background: white; padding: 32px;
+    border-radius: 10px; border: 1px solid var(--line);
+  }
+  #tela-login h2 { margin-top: 0; }
+  #tela-login input {
+    width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid var(--line);
+    border-radius: 6px; font-size: 14px;
+  }
+  #tela-login button {
+    width: 100%; padding: 10px; background: var(--navy); color: white; border: none;
+    border-radius: 6px; cursor: pointer; font-size: 14px;
+  }
+  #erro-login { color: var(--red); font-size: 13px; margin-bottom: 8px; display: none; }
+
+  #tela-painel { display: none; padding: 24px; }
+  .abas { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .abas button {
+    padding: 8px 16px; border: 1px solid var(--line); background: white;
+    border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+  .abas button.ativa { background: var(--navy); color: white; border-color: var(--navy); }
+
+  #kanban { display: flex; gap: 12px; overflow-x: auto; }
+  .coluna {
+    background: white; border: 1px solid var(--line); border-radius: 8px;
+    min-width: 220px; flex: 1; padding: 10px;
+  }
+  .coluna h3 { font-size: 13px; text-transform: uppercase; color: var(--gold); margin: 4px 0 10px; }
+  .card {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px; margin-bottom: 8px; font-size: 13px;
+  }
+  .card b { display: block; margin-bottom: 4px; }
+  .card small { color: #667; }
+  .card select { width: 100%; margin-top: 6px; padding: 4px; font-size: 12px;
+    border: 1px solid var(--line); border-radius: 4px; }
+
+  table { width: 100%; border-collapse: collapse; background: white; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  th { background: var(--navy); color: white; }
+
+  .painel-secao { display: none; }
+  .painel-secao.ativa { display: block; }
+  #busca-clientes { padding: 8px; border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; width: 280px; }
+
+  .btn { padding: 5px 10px; border: 1px solid var(--line); background: white; border-radius: 5px;
+    cursor: pointer; font-size: 12px; margin-right: 4px; }
+  .btn-primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .btn-gold { background: var(--gold); color: white; border-color: var(--gold); }
+  .badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge.rascunho { background: #eee; color: #555; }
+  .badge.aprovado { background: #e6f0ff; color: #1f4b99; }
+  .badge.enviado { background: #e4f5ec; color: var(--green); }
+
+  .form-inline { background: white; border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px; margin-bottom: 16px; display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  .form-inline label { font-size: 12px; color: #667; display: block; margin-bottom: 3px; }
+  .form-inline input, .form-inline select { padding: 7px; border: 1px solid var(--line);
+    border-radius: 5px; font-size: 13px; }
+  #aviso { position: fixed; top: 16px; right: 16px; max-width: 340px; padding: 12px 16px;
+    border-radius: 8px; color: white; font-size: 13px; display: none; z-index: 50; box-shadow: 0 4px 12px #0003; }
+  #aviso.ok { background: var(--green); }
+  #aviso.erro { background: var(--red); }
+</style>
+</head>
+<body>
+
+<div id="aviso"></div>
+
+<header>
+  <h1>Marques <span class="gold">IA</span> — Painel Administrativo</h1>
+  <button id="btn-sair">Sair</button>
+</header>
+
+<div id="tela-login">
+  <h2>Entrar</h2>
+  <div id="erro-login">E-mail ou senha inválidos.</div>
+  <input type="email" id="login-email" placeholder="E-mail" autocomplete="username">
+  <input type="password" id="login-senha" placeholder="Senha" autocomplete="current-password">
+  <button id="btn-entrar">Entrar</button>
+</div>
+
+<div id="tela-painel">
+  <div class="abas">
+    <button data-secao="kanban" class="ativa">Kanban</button>
+    <button data-secao="clientes">Clientes</button>
+    <button data-secao="contratos">Contratos</button>
+    <button data-secao="auditoria">Auditoria</button>
+  </div>
+
+  <div id="secao-kanban" class="painel-secao ativa">
+    <div id="kanban"></div>
+  </div>
+
+  <div id="secao-clientes" class="painel-secao">
+    <input type="text" id="busca-clientes" placeholder="Buscar por nome ou telefone...">
+    <table>
+      <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Último contato</th><th>Ações</th></tr></thead>
+      <tbody id="tabela-clientes"></tbody>
+    </table>
+  </div>
+
+  <div id="secao-contratos" class="painel-secao">
+    <div class="form-inline">
+      <div>
+        <label for="novo-caso-id">Nº do caso</label>
+        <input type="number" id="novo-caso-id" min="1" placeholder="ex.: 1" style="width:110px">
+      </div>
+      <div>
+        <label for="novo-tipo">Tipo de contrato</label>
+        <select id="novo-tipo"></select>
+      </div>
+      <button class="btn btn-gold" id="btn-gerar-contrato">Gerar contrato</button>
+    </div>
+    <table>
+      <thead><tr><th>Número</th><th>Tipo</th><th>Cliente</th><th>E-mail</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody id="tabela-contratos"></tbody>
+    </table>
+  </div>
+
+  <div id="secao-auditoria" class="painel-secao">
+    <table>
+      <thead><tr><th>Data</th><th>Usuário</th><th>Ação</th><th>Entidade</th></tr></thead>
+      <tbody id="tabela-auditoria"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const API = "";
+let token = localStorage.getItem("marques_ia_token") || null;
+
+const telaLogin = document.getElementById("tela-login");
+const telaPainel = document.getElementById("tela-painel");
+const btnSair = document.getElementById("btn-sair");
+const aviso = document.getElementById("aviso");
+
+const NOMES_ETAPA = {
+  novo_lead: "Novo Lead", qualificacao: "Qualificação", documentacao: "Documentação",
+  proposta: "Proposta", contrato: "Contrato", fechado: "Fechado",
+};
+const ORDEM_ETAPAS = Object.keys(NOMES_ETAPA);
+
+function notificar(texto, ok = true) {
+  aviso.textContent = texto;
+  aviso.className = ok ? "ok" : "erro";
+  aviso.style.display = "block";
+  setTimeout(() => { aviso.style.display = "none"; }, 4000);
+}
+
+function mostrarPainel() {
+  telaLogin.style.display = "none";
+  telaPainel.style.display = "block";
+  btnSair.style.display = "inline-block";
+  carregarKanban();
+}
+
+function mostrarLogin() {
+  telaLogin.style.display = "block";
+  telaPainel.style.display = "none";
+  btnSair.style.display = "none";
+}
+
+async function apiFetch(caminho, opcoes = {}) {
+  opcoes.headers = Object.assign({}, opcoes.headers, { Authorization: `Bearer ${token}` });
+  const resposta = await fetch(API + caminho, opcoes);
+  if (resposta.status === 401) {
+    token = null;
+    localStorage.removeItem("marques_ia_token");
+    mostrarLogin();
+    throw new Error("Sessão expirada");
+  }
+  return resposta;
+}
+
+async function apiJson(caminho, opcoes = {}) {
+  const r = await apiFetch(caminho, opcoes);
+  if (!r.ok) {
+    let detalhe = `Erro ${r.status}`;
+    try { const j = await r.json(); if (j.detail) detalhe = j.detail; } catch (e) {}
+    throw new Error(detalhe);
+  }
+  return r.status === 204 ? null : r.json();
+}
+
+document.getElementById("btn-entrar").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value;
+  const senha = document.getElementById("login-senha").value;
+  const erro = document.getElementById("erro-login");
+  erro.style.display = "none";
+
+  const corpo = new URLSearchParams();
+  corpo.append("username", email);
+  corpo.append("password", senha);
+
+  try {
+    const resposta = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: corpo,
+    });
+    if (!resposta.ok) throw new Error("credenciais inválidas");
+    const dados = await resposta.json();
+    token = dados.access_token;
+    localStorage.setItem("marques_ia_token", token);
+    mostrarPainel();
+  } catch (e) {
+    erro.style.display = "block";
+  }
+});
+
+btnSair.addEventListener("click", () => {
+  token = null;
+  localStorage.removeItem("marques_ia_token");
+  mostrarLogin();
+});
+
+document.querySelectorAll(".abas button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".abas button").forEach((b) => b.classList.remove("ativa"));
+    document.querySelectorAll(".painel-secao").forEach((s) => s.classList.remove("ativa"));
+    btn.classList.add("ativa");
+    document.getElementById("secao-" + btn.dataset.secao).classList.add("ativa");
+    if (btn.dataset.secao === "kanban") carregarKanban();
+    if (btn.dataset.secao === "clientes") carregarClientes();
+    if (btn.dataset.secao === "contratos") carregarContratos();
+    if (btn.dataset.secao === "auditoria") carregarAuditoria();
+  });
+});
+
+// ==================== KANBAN ====================
+async function carregarKanban() {
+  const colunas = await apiJson("/crm/kanban");
+  const container = document.getElementById("kanban");
+  container.innerHTML = "";
+  colunas.forEach((coluna) => {
+    const divColuna = document.createElement("div");
+    divColuna.className = "coluna";
+    const titulo = document.createElement("h3");
+    titulo.textContent = `${NOMES_ETAPA[coluna.etapa] || coluna.etapa} (${coluna.casos.length})`;
+    divColuna.appendChild(titulo);
+    coluna.casos.forEach((caso) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const opcoes = ORDEM_ETAPAS.map(
+        (e) => `<option value="${e}" ${e === caso.etapa_funil ? "selected" : ""}>${NOMES_ETAPA[e]}</option>`
+      ).join("");
+      card.innerHTML =
+        `<b>Caso #${caso.id}</b>${caso.area_juridica}<br>` +
+        `<small>${caso.resumo || "sem resumo"}</small>` +
+        `<select data-caso="${caso.id}">${opcoes}</select>`;
+      card.querySelector("select").addEventListener("change", (ev) =>
+        moverCaso(caso.id, ev.target.value)
+      );
+      divColuna.appendChild(card);
+    });
+    container.appendChild(divColuna);
+  });
+}
+
+async function moverCaso(casoId, etapa) {
+  try {
+    await apiJson(`/crm/casos/${casoId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ etapa_funil: etapa }),
+    });
+    notificar(`Caso #${casoId} movido para "${NOMES_ETAPA[etapa]}".`);
+    carregarKanban();
+  } catch (e) { notificar(e.message, false); }
+}
+
+// ==================== CLIENTES ====================
+async function carregarClientes(busca = "") {
+  const clientes = await apiJson("/crm/clientes" + (busca ? `?busca=${encodeURIComponent(busca)}` : ""));
+  const corpo = document.getElementById("tabela-clientes");
+  corpo.innerHTML = "";
+  clientes.forEach((c) => {
+    const linha = document.createElement("tr");
+    linha.innerHTML =
+      `<td>${c.nome || "-"}</td><td>${c.telefone}</td><td>${c.email || "-"}</td>` +
+      `<td>${new Date(c.ultimo_contato_em).toLocaleString("pt-BR")}</td>` +
+      `<td><button class="btn">Editar</button></td>`;
+    linha.querySelector("button").addEventListener("click", () => editarCliente(c));
+    corpo.appendChild(linha);
+  });
+}
+
+async function editarCliente(cliente) {
+  const nome = prompt("Nome do cliente:", cliente.nome || "");
+  if (nome === null) return;
+  const email = prompt("E-mail do cliente (usado para enviar contratos):", cliente.email || "");
+  if (email === null) return;
+  try {
+    await apiJson(`/crm/clientes/${cliente.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, email }),
+    });
+    notificar("Cliente atualizado.");
+    carregarClientes(document.getElementById("busca-clientes").value);
+  } catch (e) { notificar(e.message, false); }
+}
+
+document.getElementById("busca-clientes").addEventListener("input", (e) => {
+  carregarClientes(e.target.value);
+});
+
+// ==================== CONTRATOS ====================
+async function carregarTiposContrato() {
+  const select = document.getElementById("novo-tipo");
+  if (select.options.length) return;
+  try {
+    const tipos = await apiJson("/contratos/tipos");
+    select.innerHTML = tipos.map((t) => `<option value="${t.tipo}">${t.titulo}</option>`).join("");
+  } catch (e) { notificar(e.message, false); }
+}
+
+async function carregarContratos() {
+  await carregarTiposContrato();
+  const contratos = await apiJson("/contratos");
+  const corpo = document.getElementById("tabela-contratos");
+  corpo.innerHTML = "";
+  contratos.forEach((c) => {
+    const linha = document.createElement("tr");
+    const podeAprovar = c.status === "rascunho";
+    const podeEnviar = (c.status === "aprovado" || c.status === "enviado") && c.cliente_email;
+    linha.innerHTML =
+      `<td>${c.numero || "-"}</td><td>${c.tipo}</td><td>${c.cliente_nome || "-"}</td>` +
+      `<td>${c.cliente_email || "-"}</td>` +
+      `<td><span class="badge ${c.status}">${c.status}</span></td>` +
+      `<td>` +
+        `<button class="btn btn-baixar">Baixar</button>` +
+        (podeAprovar ? `<button class="btn btn-primary btn-aprovar">Aprovar</button>` : "") +
+        (podeEnviar ? `<button class="btn btn-gold btn-enviar">Enviar e-mail</button>` : "") +
+      `</td>`;
+    linha.querySelector(".btn-baixar").addEventListener("click", () => baixarContrato(c.id, c.numero));
+    const bAprovar = linha.querySelector(".btn-aprovar");
+    if (bAprovar) bAprovar.addEventListener("click", () => aprovarContrato(c.id));
+    const bEnviar = linha.querySelector(".btn-enviar");
+    if (bEnviar) bEnviar.addEventListener("click", () => enviarContrato(c.id));
+    corpo.appendChild(linha);
+  });
+}
+
+document.getElementById("btn-gerar-contrato").addEventListener("click", async () => {
+  const casoId = parseInt(document.getElementById("novo-caso-id").value, 10);
+  const tipo = document.getElementById("novo-tipo").value;
+  if (!casoId) { notificar("Informe o nº do caso.", false); return; }
+  try {
+    const c = await apiJson("/contratos/gerar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ caso_id: casoId, tipo }),
+    });
+    notificar(`Contrato ${c.numero} gerado (rascunho).`);
+    carregarContratos();
+  } catch (e) { notificar(e.message, false); }
+});
+
+async function aprovarContrato(id) {
+  try {
+    await apiJson(`/contratos/${id}/aprovar`, { method: "PATCH" });
+    notificar("Contrato aprovado. Já pode ser enviado ao cliente.");
+    carregarContratos();
+  } catch (e) { notificar(e.message, false); }
+}
+
+async function enviarContrato(id) {
+  if (!confirm("Enviar o contrato por e-mail ao cliente agora?")) return;
+  try {
+    const r = await apiJson(`/contratos/${id}/enviar`, { method: "POST" });
+    notificar(r.detalhe || "Contrato enviado.");
+    carregarContratos();
+  } catch (e) { notificar(e.message, false); }
+}
+
+async function baixarContrato(id, numero) {
+  try {
+    const r = await apiFetch(`/contratos/${id}/download`);
+    if (!r.ok) throw new Error("Não foi possível baixar o PDF.");
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${numero || "contrato"}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) { notificar(e.message, false); }
+}
+
+// ==================== AUDITORIA ====================
+async function carregarAuditoria() {
+  const logs = await apiJson("/crm/auditoria");
+  const corpo = document.getElementById("tabela-auditoria");
+  corpo.innerHTML = "";
+  logs.forEach((log) => {
+    const linha = document.createElement("tr");
+    linha.innerHTML =
+      `<td>${new Date(log.criado_em).toLocaleString("pt-BR")}</td><td>${log.usuario_email || "-"}</td>` +
+      `<td>${log.acao}</td><td>${log.entidade}</td>`;
+    corpo.appendChild(linha);
+  });
+}
+
+if (token) { mostrarPainel(); } else { mostrarLogin(); }
+</script>
+
+</body>
+</html>

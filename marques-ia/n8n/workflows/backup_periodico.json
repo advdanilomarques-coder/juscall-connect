@@ -1,0 +1,73 @@
+{
+  "name": "Marques IA - Backup Periodico",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "days", "daysInterval": 1, "triggerAtHour": 3 }] }
+      },
+      "id": "trigger-schedule",
+      "name": "Diariamente as 3h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "command": "bash /caminho/completo/para/marques-ia/backup.sh"
+      },
+      "id": "executar-backup",
+      "name": "Executar backup.sh",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            { "leftValue": "={{$json.exitCode}}", "rightValue": 0, "operator": { "type": "number", "operation": "notEquals" } }
+          ]
+        }
+      },
+      "id": "verificar-falha",
+      "name": "Backup Falhou?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sistema@marquesadvogados.com.br",
+        "toEmail": "equipe@marquesadvogados.com.br",
+        "subject": "ALERTA — Falha no backup do Marques IA",
+        "text": "=O backup automático de hoje falhou. Saída do comando:\n\n{{$json.stderr || $json.stdout}}"
+      },
+      "id": "alertar-falha",
+      "name": "Alertar Falha por E-mail",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 260],
+      "credentials": {
+        "smtp": { "id": "smtp-escritorio", "name": "SMTP do Escritório" }
+      }
+    }
+  ],
+  "connections": {
+    "Diariamente as 3h": {
+      "main": [[{ "node": "Executar backup.sh", "type": "main", "index": 0 }]]
+    },
+    "Executar backup.sh": {
+      "main": [[{ "node": "Backup Falhou?", "type": "main", "index": 0 }]]
+    },
+    "Backup Falhou?": {
+      "main": [
+        [{ "node": "Alertar Falha por E-mail", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "meta": {
+    "descricao": "Executa backup.sh diariamente às 3h via nó Execute Command (requer n8n rodando na mesma máquina ou com acesso SSH ao servidor). Ajuste o caminho completo do script antes de ativar. Envia e-mail de alerta se o comando retornar código de saída diferente de zero."
+  }
+}

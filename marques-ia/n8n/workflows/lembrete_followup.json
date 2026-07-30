@@ -1,0 +1,89 @@
+{
+  "name": "Marques IA - Lembrete de Follow-up",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "hours", "hoursInterval": 6 }] }
+      },
+      "id": "trigger-schedule",
+      "name": "A cada 6 horas",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/crm/casos?status=aberto",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "buscar-casos",
+      "name": "Buscar Casos Abertos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": { "id": "marques-ia-token", "name": "Marques IA - Token Admin" }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            {
+              "leftValue": "={{$json.atualizado_em}}",
+              "rightValue": "={{$now.minus(3, 'days').toISO()}}",
+              "operator": { "type": "dateTime", "operation": "before" }
+            }
+          ]
+        }
+      },
+      "id": "filtro-parado",
+      "name": "Parado ha mais de 3 dias",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:8000/crm/casos/{{$json.id}}",
+        "method": "PATCH",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "resumo", "value": "={{$json.resumo}} [Follow-up automático pendente]" }
+          ]
+        }
+      },
+      "id": "marcar-followup",
+      "name": "Marcar para Follow-up",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 260],
+      "credentials": {
+        "httpHeaderAuth": { "id": "marques-ia-token", "name": "Marques IA - Token Admin" }
+      }
+    }
+  ],
+  "connections": {
+    "A cada 6 horas": {
+      "main": [[{ "node": "Buscar Casos Abertos", "type": "main", "index": 0 }]]
+    },
+    "Buscar Casos Abertos": {
+      "main": [[{ "node": "Parado ha mais de 3 dias", "type": "main", "index": 0 }]]
+    },
+    "Parado ha mais de 3 dias": {
+      "main": [
+        [{ "node": "Marcar para Follow-up", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "meta": {
+    "descricao": "Verifica casos abertos a cada 6 horas e sinaliza para follow-up humano os que estão parados há mais de 3 dias na mesma etapa do funil. Requer uma credencial HTTP Header Auth chamada 'Marques IA - Token Admin' com o header 'Authorization: Bearer SEU_TOKEN'."
+  }
+}

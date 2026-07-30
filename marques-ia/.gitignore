@@ -1,0 +1,17 @@
+# NUNCA versionar segredos — o .env fica só na máquina do usuário
+.env
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Artefatos gerados em runtime
+backend/storage/contratos/*.pdf
+backend/storage/documentos/*
+!backend/storage/**/.gitkeep
+
+# Backups
+backups/

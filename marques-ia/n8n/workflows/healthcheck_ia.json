@@ -1,0 +1,79 @@
+{
+  "name": "Marques IA - Healthcheck do Provedor de IA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] }
+      },
+      "id": "trigger-schedule",
+      "name": "A cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/agent/healthcheck",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "checar-ia",
+      "name": "Checar Saude da IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": { "id": "marques-ia-token", "name": "Marques IA - Token Admin" }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            { "leftValue": "={{$json.status}}", "rightValue": "falha", "operator": { "type": "string", "operation": "equals" } }
+          ]
+        }
+      },
+      "id": "verificar-falha-ia",
+      "name": "IA Falhou?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sistema@marquesadvogados.com.br",
+        "toEmail": "equipe@marquesadvogados.com.br",
+        "subject": "ALERTA — Todos os modelos de IA gratuitos falharam",
+        "text": "=Nenhum dos modelos configurados em OPENROUTER_MODEL_PRIMARY/_FALLBACK_1/_FALLBACK_2 respondeu.\n\nDetalhe: {{$json.detalhe}}\n\nAcesse https://openrouter.ai/models, escolha um modelo ':free' disponível e atualize o .env."
+      },
+      "id": "alertar-falha-ia",
+      "name": "Alertar por E-mail",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 260],
+      "credentials": {
+        "smtp": { "id": "smtp-escritorio", "name": "SMTP do Escritório" }
+      }
+    }
+  ],
+  "connections": {
+    "A cada hora": {
+      "main": [[{ "node": "Checar Saude da IA", "type": "main", "index": 0 }]]
+    },
+    "Checar Saude da IA": {
+      "main": [[{ "node": "IA Falhou?", "type": "main", "index": 0 }]]
+    },
+    "IA Falhou?": {
+      "main": [
+        [{ "node": "Alertar por E-mail", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "meta": {
+    "descricao": "Chama GET /agent/healthcheck a cada hora. Se todos os modelos gratuitos configurados estiverem falhando (ex.: removidos do tier gratuito do OpenRouter), envia e-mail de alerta para a equipe trocar o modelo no .env — resolve exatamente o tipo de problema que motivou a estratégia de failover da seção 5."
+  }
+}
