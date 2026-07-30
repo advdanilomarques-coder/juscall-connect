@@ -45,6 +45,14 @@ async def whatsapp_incoming(request: Request) -> dict:
     processamento de cada mensagem é feito em sequência e os erros são
     tratados de forma isolada (uma mensagem com erro não derruba as demais).
     """
+    # Valida a assinatura da Meta (segurança) antes de processar.
+    raw_body = await request.body()
+    if not whatsapp_client.verify_signature(
+        raw_body, request.headers.get("X-Hub-Signature-256")
+    ):
+        logger.warning("Webhook do WhatsApp com assinatura inválida — ignorado.")
+        return {"status": "invalid_signature"}
+
     payload = await request.json()
     incoming = whatsapp_client.parse_webhook(payload)
 

@@ -32,20 +32,20 @@ async def seed_admin() -> None:
     """
     async with SessionLocal() as session:
         result = await session.execute(
-            select(AdminUser).where(AdminUser.email == settings.admin_email)
+            select(AdminUser).where(AdminUser.email == settings.admin_default_email)
         )
         if result.scalar_one_or_none() is not None:
             return
         admin = AdminUser(
-            email=settings.admin_email,
-            name="Administrador",
-            password_hash=hash_password(settings.admin_password),
+            email=settings.admin_default_email,
+            name=settings.admin_default_name,
+            password_hash=hash_password(settings.admin_default_password),
             is_active=True,
             is_superuser=True,
         )
         session.add(admin)
         await session.commit()
-        logger.info("Administrador inicial criado: %s", settings.admin_email)
+        logger.info("Administrador inicial criado: %s", settings.admin_default_email)
 
 
 class AdminService:

@@ -27,13 +27,35 @@ class WhatsAppClient(ChannelClient):
     name = "whatsapp"
 
     def __init__(self) -> None:
-        self._token = settings.whatsapp_access_token
+        self._token = settings.whatsapp_token
         self._phone_id = settings.whatsapp_phone_number_id
+        self._app_secret = settings.whatsapp_app_secret
         self._base = settings.whatsapp_api_base.rstrip("/")
 
     @property
     def configured(self) -> bool:
         return bool(self._token and self._phone_id)
+
+    def verify_signature(self, body: bytes, signature_header: str | None) -> bool:
+        """Valida a assinatura X-Hub-Signature-256 enviada pela Meta.
+
+        A Meta assina cada webhook com HMAC-SHA256 usando o APP_SECRET. Isso
+        garante que a requisição realmente veio da Meta (e não de um impostor).
+        Se o APP_SECRET não estiver configurado, a validação é ignorada (modo
+        desenvolvimento) — configure-o em produção.
+        """
+        if not self._app_secret:
+            return True  # sem segredo configurado: não valida (dev)
+        if not signature_header or not signature_header.startswith("sha256="):
+            return False
+        import hashlib
+        import hmac
+
+        expected = hmac.new(
+            self._app_secret.encode("utf-8"), body, hashlib.sha256
+        ).hexdigest()
+        received = signature_header.split("=", 1)[1]
+        return hmac.compare_digest(expected, received)
 
     def verify(self, mode: str | None, token: str | None, challenge: str | None) -> str | None:
         """Valida o handshake do webhook. Retorna o challenge se OK, senão None.

@@ -76,14 +76,25 @@ class Settings(BaseSettings):
     jwt_secret: str = "troque-esta-chave-em-producao"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 720
-    admin_email: str = "admin@marquesadvogados.com.br"
-    admin_password: str = "troque-esta-senha"
+    # Administrador padrão criado na 1ª execução (semente).
+    admin_default_email: str = "admin@marquesadvogados.com.br"
+    admin_default_password: str = "troque-esta-senha"
+    admin_default_name: str = "Administrador"
     rate_limit_per_minute: int = 60
 
-    # --- WhatsApp Business API ---
-    whatsapp_verify_token: str = "token-de-verificacao-do-webhook"
-    whatsapp_access_token: str = ""
+    # --- WhatsApp Business Cloud API (Meta) ---
+    # Token de acesso da API (temporário de teste ou permanente do System User).
+    whatsapp_token: str = ""
+    # Número de telefone exibido (apenas informativo).
+    whatsapp_phone_number: str = ""
+    # ID do número (usado nas chamadas de envio da API).
     whatsapp_phone_number_id: str = ""
+    # Token de verificação do webhook (você define; use o mesmo no painel Meta).
+    whatsapp_verify_token: str = "token-de-verificacao-do-webhook"
+    # ID da conta WhatsApp Business (WABA).
+    whatsapp_business_account_id: str = ""
+    # Segredo do app (valida a assinatura X-Hub-Signature-256 dos webhooks).
+    whatsapp_app_secret: str = ""
     whatsapp_api_base: str = "https://graph.facebook.com/v21.0"
 
     # --- Armazenamento de documentos ---
