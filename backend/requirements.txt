@@ -1,0 +1,50 @@
+# ============================================================================
+# DEPENDÊNCIAS DO PROJETO — MARQUES IA (Backend)
+# ----------------------------------------------------------------------------
+# Cada dependência tem uma única responsabilidade. Versões fixadas (pinned)
+# garantem builds reproduzíveis em qualquer máquina/servidor.
+# ============================================================================
+
+# --- Framework web assíncrono (API REST + webhooks dos canais) ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20      # upload de arquivos (documentos dos clientes)
+
+# --- Configuração por variáveis de ambiente (.env), com validação de tipos ---
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# --- SDKs oficiais dos provedores de IA (carregados sob demanda / lazy) ---
+# Instale apenas os que for usar. A Camada AI Provider importa cada SDK
+# somente quando o provedor correspondente é realmente acionado, então o
+# sistema sobe mesmo sem todos instalados.
+google-generativeai==0.8.3    # Gemini (camada gratuita) — provedor PRINCIPAL sugerido
+anthropic==0.42.0             # Claude (Anthropic)
+openai==1.59.6                # GPT (OpenAI)
+
+# --- Cliente HTTP assíncrono ---
+# Usado pelos provedores REST genéricos (DeepSeek, Mistral, OpenRouter, Grok,
+# Ollama) e pela integração com a WhatsApp Business API.
+httpx==0.28.1
+
+# --- Banco de dados / ORM (memória persistente e CRM) ---
+# SQLAlchemy async funciona tanto com PostgreSQL (asyncpg) quanto com
+# SQLite (aiosqlite). Trocar de banco = trocar apenas a DATABASE_URL.
+sqlalchemy==2.0.36
+aiosqlite==0.20.0             # driver SQLite (padrão local/desenvolvimento)
+asyncpg==0.30.0               # driver PostgreSQL (produção)
+greenlet==3.1.1               # requisito do modo assíncrono do SQLAlchemy
+
+# --- Segurança (painel administrativo) ---
+PyJWT==2.10.1                 # emissão/validação de tokens JWT
+# O hash de senhas usa PBKDF2-HMAC-SHA256 da biblioteca padrão do Python
+# (app/core/security.py) — sem dependência externa, evitando conflitos de
+# versão entre bibliotecas de hashing.
+
+# --- Geração de contratos em PDF ---
+fpdf2==2.8.2                  # PDF puro-Python, sem dependências de sistema
+
+# --- Testes automatizados ---
+pytest==8.3.4
+pytest-asyncio==0.25.2

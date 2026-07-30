@@ -1,0 +1,20 @@
+# ==== Segredos — NUNCA comitar ====
+.env
+
+# ==== Ambiente virtual Python ====
+.venv/
+.venv-test/
+venv/
+env/
+
+# ==== Cache/artefatos do Python ====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ==== Logs e dados locais ====
+*.log
+storage/
