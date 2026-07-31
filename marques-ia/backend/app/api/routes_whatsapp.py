@@ -13,7 +13,7 @@ import hashlib
 import hmac
 import json
 import logging
-from typing import Optional, Tuple
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy.orm import Session
@@ -23,7 +23,8 @@ from app.core.audit import registrar_log
 from app.core.config import settings
 from app.core.rate_limit import permitir
 from app.database.session import get_db
-from app.integrations.whatsapp_client import enviar_mensagem_texto
+from app.integrations.transcription import TranscricaoError, transcrever_audio
+from app.integrations.whatsapp_client import baixar_midia, enviar_mensagem_texto
 
 router = APIRouter(prefix="/webhook/whatsapp", tags=["whatsapp"])
 logger = logging.getLogger("marques_ia.whatsapp.webhook")
@@ -34,6 +35,10 @@ MENSAGEM_TIPO_NAO_SUPORTADO = (
     "Recebemos seu arquivo, mas por enquanto só conseguimos processar mensagens em texto. "
     "Pode descrever em poucas palavras o que você precisa? Se preferir, um de nossos "
     "advogados também pode dar continuidade."
+)
+
+MENSAGEM_AUDIO_FALHOU = (
+    "Não consegui ouvir seu áudio agora. Pode me enviar em texto o que você precisa?"
 )
 
 MENSAGEM_LIMITE_EXCEDIDO = (
@@ -88,11 +93,11 @@ def _validar_assinatura(corpo_bruto: bytes, assinatura_header: Optional[str]) ->
     return hmac.compare_digest(assinatura_esperada, assinatura_recebida)
 
 
-def _extrair_mensagem(payload: dict) -> Optional[Tuple[str, Optional[str], Optional[str], bool]]:
+def _extrair_mensagem(payload: dict) -> Optional[dict]:
     """
-    Extrai (telefone, texto, nome_do_contato, é_mensagem_de_texto) do payload
-    padrão da Cloud API. Retorna None se o payload não contiver uma mensagem
-    nova relevante (ex.: evento de status como 'entregue' ou 'lido').
+    Extrai os dados da mensagem do payload padrão da Cloud API. Retorna um dict
+    com telefone, texto, nome, tipo e media_id — ou None se o payload não contiver
+    uma mensagem nova relevante (ex.: evento de status como 'entregue' ou 'lido').
     """
     try:
         value = payload["entry"][0]["changes"][0]["value"]
@@ -109,12 +114,18 @@ def _extrair_mensagem(payload: dict) -> Optional[Tuple[str, Optional[str], Optio
         if contatos:
             nome_cliente = contatos[0].get("profile", {}).get("name")
 
+        base = {"telefone": telefone, "nome": nome_cliente, "tipo": tipo, "texto": None, "media_id": None}
+
         if tipo == "text":
-            texto = mensagem["text"]["body"]
-            return telefone, texto, nome_cliente, True
+            base["texto"] = mensagem["text"]["body"]
+            return base
+
+        if tipo == "audio":
+            base["media_id"] = (mensagem.get("audio") or {}).get("id")
+            return base
 
         if tipo in TIPOS_NAO_TEXTO_SUPORTADOS:
-            return telefone, None, nome_cliente, False
+            return base
 
         return None
     except (KeyError, IndexError, TypeError) as exc:
@@ -142,7 +153,10 @@ async def receber_mensagem(request: Request, db: Session = Depends(get_db)):
         # Evento irrelevante para o agente (ex.: confirmação de leitura).
         return {"status": "ignorado"}
 
-    telefone, texto_recebido, nome_cliente, e_texto = extraido
+    telefone = extraido["telefone"]
+    nome_cliente = extraido["nome"]
+    tipo = extraido["tipo"]
+    texto_recebido = extraido["texto"]
 
     if not permitir(chave=f"whatsapp:{telefone}", limite=20, janela_segundos=60):
         logger.warning("Rate limit excedido para o telefone %s", telefone)
@@ -150,10 +164,27 @@ async def receber_mensagem(request: Request, db: Session = Depends(get_db)):
         registrar_log(db, acao="rate_limit_excedido", entidade="whatsapp", detalhes=telefone)
         return {"status": "limite_excedido"}
 
-    if not e_texto:
+    # Áudio de voz: baixa o arquivo do WhatsApp e transcreve para texto.
+    if tipo == "audio":
+        if not settings.TRANSCRICAO_HABILITADA or not extraido["media_id"]:
+            await enviar_mensagem_texto(telefone_destino=telefone, texto=MENSAGEM_TIPO_NAO_SUPORTADO)
+            return {"status": "audio_sem_transcricao"}
+        try:
+            audio_bytes = await baixar_midia(extraido["media_id"])
+            texto_recebido = await transcrever_audio(audio_bytes)
+            logger.info("Áudio de %s transcrito com sucesso.", telefone)
+        except (TranscricaoError, Exception) as exc:  # noqa: BLE001 — degrada com segurança
+            logger.error("Falha ao processar áudio de %s: %s", telefone, exc)
+            await enviar_mensagem_texto(telefone_destino=telefone, texto=MENSAGEM_AUDIO_FALHOU)
+            return {"status": "audio_falhou"}
+    elif tipo != "text":
         await enviar_mensagem_texto(telefone_destino=telefone, texto=MENSAGEM_TIPO_NAO_SUPORTADO)
         logger.info("Mensagem não textual recebida de %s — resposta padrão enviada.", telefone)
         return {"status": "tipo_nao_suportado"}
+
+    if not texto_recebido:
+        await enviar_mensagem_texto(telefone_destino=telefone, texto=MENSAGEM_TIPO_NAO_SUPORTADO)
+        return {"status": "sem_texto"}
 
     resultado = await responder_cliente(
         db=db,

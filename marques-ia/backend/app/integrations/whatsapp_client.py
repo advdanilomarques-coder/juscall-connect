@@ -45,3 +45,26 @@ async def enviar_mensagem_texto(telefone_destino: str, texto: str) -> bool:
 
     logger.info("Mensagem enviada com sucesso ao WhatsApp: %s", telefone_destino)
     return True
+
+
+async def baixar_midia(media_id: str) -> bytes:
+    """
+    Baixa um arquivo de mídia (ex.: áudio de voz) do WhatsApp a partir do seu
+    media_id. É um processo em duas etapas exigido pela Cloud API:
+      1) consulta a URL temporária do arquivo pelo media_id;
+      2) baixa o conteúdo dessa URL (ambas autenticadas com o WHATSAPP_TOKEN).
+
+    Retorna os bytes do arquivo. Levanta httpx.HTTPError em caso de falha.
+    """
+    headers = {"Authorization": f"Bearer {settings.WHATSAPP_TOKEN}"}
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        meta = await client.get(
+            f"https://graph.facebook.com/{GRAPH_API_VERSION}/{media_id}", headers=headers
+        )
+        meta.raise_for_status()
+        url_arquivo = meta.json()["url"]
+
+        arquivo = await client.get(url_arquivo, headers=headers)
+        arquivo.raise_for_status()
+        return arquivo.content

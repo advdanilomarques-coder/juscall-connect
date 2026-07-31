@@ -57,6 +57,16 @@ class Settings(BaseSettings):
     SMTP_USE_TLS: bool = True           # STARTTLS (porta 587). Use False + SMTP_USE_SSL p/ porta 465.
     SMTP_USE_SSL: bool = False
 
+    # ---- Transcrição de áudio (voz do WhatsApp) — OPCIONAL ----
+    # Converte áudios de voz recebidos no WhatsApp em texto (Whisper), para o
+    # agente entender e responder. Se TRANSCRICAO_API_KEY ficar em branco, o
+    # recurso fica DESATIVADO e áudios recebem uma resposta pedindo texto.
+    # Padrão: Groq (tem plano gratuito e é compatível com a API da OpenAI).
+    # Pegue a chave grátis em https://console.groq.com/keys
+    TRANSCRICAO_API_KEY: str = ""
+    TRANSCRICAO_BASE_URL: str = "https://api.groq.com/openai/v1"
+    TRANSCRICAO_MODELO: str = "whisper-large-v3-turbo"
+
     # ---- Administrador padrão (criado na primeira execução) ----
     ADMIN_DEFAULT_EMAIL: str = "admin@marquesadvogados.com.br"
     ADMIN_DEFAULT_PASSWORD: str = "troque_esta_senha_admin"
@@ -77,6 +87,11 @@ class Settings(BaseSettings):
     def EMAIL_HABILITADO(self) -> bool:
         """True somente quando o SMTP está configurado o suficiente para enviar."""
         return bool(self.SMTP_HOST and (self.SMTP_FROM_EMAIL or self.SMTP_USER))
+
+    @property
+    def TRANSCRICAO_HABILITADA(self) -> bool:
+        """True quando há chave configurada para transcrever áudio de voz."""
+        return bool(self.TRANSCRICAO_API_KEY)
 
 
 settings = Settings()
