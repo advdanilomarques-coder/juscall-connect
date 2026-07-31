@@ -5,71 +5,206 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marques Advogados Associados</title>
 <style>
-  :root { --navy:#12233d; --gold:#b8935a; --cream:#f7f5f1; }
+  :root { --navy:#12233d; --navy2:#1c3358; --gold:#b8935a; --cream:#f7f5f1; --ink:#2a2f36; --muted:#6a7480; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  html,body { height:100%; }
-  body {
-    font-family: Georgia, "Times New Roman", serif;
-    background: radial-gradient(1200px 600px at 50% -10%, #1c3358 0%, #12233d 55%, #0d1a2e 100%);
-    color: var(--cream);
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;
-  }
-  .card { text-align:center; max-width:540px; width:100%; }
-  .emblem { width:130px; height:130px; margin:0 auto 22px; display:block; }
-  h1 { font-size:clamp(24px,5vw,32px); letter-spacing:1px; color:#fff; margin-bottom:8px; line-height:1.2; }
-  .sub { color:var(--gold); font-size:13px; letter-spacing:4px; text-transform:uppercase;
-         font-family:Arial,Helvetica,sans-serif; margin-bottom:26px; }
-  .divider { width:64px; height:2px; background:var(--gold); margin:0 auto 26px; opacity:.9; }
-  .greeting { font-size:18px; line-height:1.65; color:#dbe1ea; margin-bottom:34px; }
-  .whats {
-    display:inline-flex; align-items:center; gap:11px; background:#25D366; color:#fff;
-    text-decoration:none; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:17px;
-    padding:16px 30px; border-radius:44px; box-shadow:0 10px 24px rgba(0,0,0,.35);
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .whats:hover { transform:translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.42); }
-  .whats svg { width:24px; height:24px; fill:#fff; }
-  .num { font-family:Arial,Helvetica,sans-serif; color:#9aa5b5; font-size:14px; margin-top:16px; letter-spacing:.5px; }
-  .painel { display:inline-block; margin-top:46px; color:#5f6b7e; font-family:Arial,Helvetica,sans-serif;
-            font-size:11px; text-decoration:none; letter-spacing:2px; text-transform:uppercase; }
-  .painel:hover { color:var(--gold); }
+  html { scroll-behavior:smooth; }
+  body { font-family: Georgia, "Times New Roman", serif; color:var(--ink); background:var(--cream); line-height:1.6; }
+  a { color:inherit; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+  .sans { font-family: Arial, Helvetica, sans-serif; }
+
+  /* ---------- NAV ---------- */
+  nav { position:sticky; top:0; z-index:20; background:rgba(18,35,61,.96); backdrop-filter:blur(6px); }
+  nav .wrap { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  nav .brand { color:#fff; font-size:17px; letter-spacing:.5px; }
+  nav .brand b { color:var(--gold); }
+  nav ul { list-style:none; display:flex; gap:26px; }
+  nav ul a { color:#d7dce4; text-decoration:none; font-family:Arial,sans-serif; font-size:14px; }
+  nav ul a:hover { color:var(--gold); }
+  nav .menu-links { display:flex; }
+  @media (max-width:720px){ nav .menu-links{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero { background:radial-gradient(1200px 600px at 50% -10%, var(--navy2) 0%, var(--navy) 55%, #0d1a2e 100%); color:var(--cream); text-align:center; padding:64px 24px 76px; }
+  .emblem { width:128px; height:128px; margin:0 auto 20px; display:block; }
+  .hero h1 { color:#fff; font-size:clamp(26px,5vw,40px); letter-spacing:1px; }
+  .hero .sub { color:var(--gold); font-family:Arial,sans-serif; font-size:13px; letter-spacing:4px; text-transform:uppercase; margin-top:8px; }
+  .divider { width:64px; height:2px; background:var(--gold); margin:22px auto; }
+  .hero p.lead { font-size:19px; color:#dbe1ea; max-width:600px; margin:0 auto 30px; }
+  .whats { display:inline-flex; align-items:center; gap:11px; background:#25D366; color:#fff; text-decoration:none; font-family:Arial,sans-serif; font-weight:700; font-size:17px; padding:15px 30px; border-radius:44px; box-shadow:0 10px 24px rgba(0,0,0,.35); transition:transform .12s ease; }
+  .whats:hover { transform:translateY(-2px); }
+  .whats svg { width:23px; height:23px; fill:#fff; }
+  .hero .num { font-family:Arial,sans-serif; color:#9aa5b5; font-size:14px; margin-top:14px; }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding:70px 0; }
+  .eyebrow { color:var(--gold); font-family:Arial,sans-serif; font-size:12px; letter-spacing:3px; text-transform:uppercase; text-align:center; }
+  h2 { text-align:center; font-size:clamp(23px,4vw,30px); color:var(--navy); margin:8px 0 10px; }
+  .center-divider { width:56px; height:2px; background:var(--gold); margin:0 auto 34px; }
+
+  /* Sobre */
+  .sobre-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+  @media (max-width:760px){ .sobre-grid{ grid-template-columns:1fr; } }
+  .sobre-txt p { margin-bottom:14px; color:#3c434c; }
+  .sobre-img { border-radius:14px; min-height:280px; background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); position:relative; overflow:hidden; box-shadow:0 14px 34px rgba(18,35,61,.25); display:flex; align-items:center; justify-content:center; }
+  .sobre-img svg { width:88px; height:88px; opacity:.9; }
+  .sobre-img .tag { position:absolute; bottom:14px; right:16px; color:#ffffff88; font-family:Arial,sans-serif; font-size:11px; }
+
+  /* Áreas */
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  @media (max-width:900px){ .cards{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .cards{ grid-template-columns:1fr; } }
+  .card { background:#fff; border:1px solid #e6e2da; border-radius:12px; padding:26px 20px; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.05); }
+  .card .ico { width:46px; height:46px; margin:0 auto 14px; color:var(--gold); }
+  .card h3 { color:var(--navy); font-size:17px; margin-bottom:8px; }
+  .card p { font-size:14px; color:var(--muted); }
+
+  /* Equipe */
+  .equipe { background:#fff; }
+  .team { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  @media (max-width:760px){ .team{ grid-template-columns:1fr; max-width:340px; margin:0 auto; } }
+  .member { text-align:center; }
+  .avatar { width:120px; height:120px; border-radius:50%; margin:0 auto 14px; background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:38px; font-family:Georgia,serif; border:3px solid var(--gold); }
+  .member h3 { color:var(--navy); font-size:18px; }
+  .member .role { color:var(--muted); font-family:Arial,sans-serif; font-size:13px; }
+  .equipe .obs { text-align:center; color:#aa9; font-family:Arial,sans-serif; font-size:12px; margin-top:30px; }
+  .staff { display:block; text-align:center; margin-top:10px; }
+  .staff a { color:var(--muted); font-family:Arial,sans-serif; font-size:12px; letter-spacing:1px; text-decoration:none; }
+  .staff a:hover { color:var(--gold); }
+
+  /* Rodapé */
+  footer { background:var(--navy); color:#cdd4de; text-align:center; padding:56px 24px; }
+  footer h2 { color:#fff; }
+  footer .center-divider { margin-bottom:26px; }
+  footer .num { font-family:Arial,sans-serif; margin-top:14px; color:#9aa5b5; font-size:14px; }
+  footer .copy { margin-top:34px; font-family:Arial,sans-serif; font-size:12px; color:#6b7688; }
 </style>
 </head>
 <body>
-  <div class="card">
-    <svg class="emblem" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" aria-label="Marques Advogados">
-      <circle cx="65" cy="65" r="61" fill="none" stroke="#b8935a" stroke-width="2"/>
-      <circle cx="65" cy="65" r="52" fill="none" stroke="#b8935a" stroke-width="1" opacity="0.55"/>
-      <!-- balança da justiça -->
-      <g stroke="#b8935a" stroke-width="2.2" fill="none" stroke-linecap="round">
-        <line x1="65" y1="34" x2="65" y2="42"/>
-        <line x1="44" y1="46" x2="86" y2="46"/>
-        <line x1="44" y1="46" x2="38" y2="60"/><line x1="44" y1="46" x2="50" y2="60"/>
-        <path d="M36 60 a8 4 0 0 0 16 0" fill="none"/>
-        <line x1="86" y1="46" x2="80" y2="60"/><line x1="86" y1="46" x2="92" y2="60"/>
-        <path d="M78 60 a8 4 0 0 0 16 0" fill="none"/>
-        <line x1="55" y1="46" x2="75" y2="46"/>
-      </g>
-      <text x="65" y="96" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#b8935a" letter-spacing="2">MA</text>
-    </svg>
 
-    <h1>Marques Advogados Associados</h1>
-    <div class="sub">Direito Bancário &amp; Cível</div>
-    <div class="divider"></div>
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="wrap">
+    <div class="brand sans">Marques <b>Advogados</b></div>
+    <ul class="menu-links sans">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#areas">Áreas</a></li>
+      <li><a href="#equipe">Equipe</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ul>
+  </div>
+</nav>
 
-    <p class="greeting">
-      Olá! Seja bem-vindo(a). Atendemos com agilidade e total sigilo.
-      Fale conosco agora mesmo — é rápido e sem compromisso.
-    </p>
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <!-- TROQUE por sua logo real: substitua este <svg> por <img src="/painel/logo.png" style="width:128px"> -->
+  <svg class="emblem" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" aria-label="Marques Advogados">
+    <circle cx="65" cy="65" r="61" fill="none" stroke="#b8935a" stroke-width="2"/>
+    <circle cx="65" cy="65" r="52" fill="none" stroke="#b8935a" stroke-width="1" opacity="0.55"/>
+    <g stroke="#b8935a" stroke-width="2.2" fill="none" stroke-linecap="round">
+      <line x1="65" y1="34" x2="65" y2="42"/>
+      <line x1="44" y1="46" x2="86" y2="46"/>
+      <line x1="44" y1="46" x2="38" y2="60"/><line x1="44" y1="46" x2="50" y2="60"/>
+      <path d="M36 60 a8 4 0 0 0 16 0"/>
+      <line x1="86" y1="46" x2="80" y2="60"/><line x1="86" y1="46" x2="92" y2="60"/>
+      <path d="M78 60 a8 4 0 0 0 16 0"/>
+    </g>
+    <text x="65" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#b8935a" letter-spacing="2">MA</text>
+  </svg>
+  <h1>Marques Advogados Associados</h1>
+  <div class="sub">Direito Bancário &amp; Cível</div>
+  <div class="divider"></div>
+  <p class="lead">Olá! Seja bem-vindo(a). Atendemos com agilidade e total sigilo. Fale conosco agora mesmo — é rápido e sem compromisso.</p>
+  <a class="whats" href="https://wa.me/__WHATSAPP_NUMERO__?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20o%20escrit%C3%B3rio." target="_blank" rel="noopener">
+    <svg viewBox="0 0 32 32"><path d="M16 3C9 3 3.5 8.5 3.5 15.5c0 2.3.6 4.5 1.8 6.4L3 29l7.3-2.2c1.8 1 3.9 1.5 5.7 1.5 7 0 12.5-5.5 12.5-12.5S23 3 16 3zm0 22.6c-1.7 0-3.4-.5-4.8-1.3l-.3-.2-4.3 1.3 1.3-4.2-.2-.3c-1-1.5-1.5-3.3-1.5-5.1 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8z"/><path d="M21.5 18.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+    Falar no WhatsApp
+  </a>
+  <div class="num sans">__WHATSAPP_DISPLAY__</div>
+</header>
 
+<!-- ================= SOBRE ================= -->
+<section id="sobre">
+  <div class="wrap">
+    <div class="eyebrow">Sobre a empresa</div>
+    <h2>Quem somos</h2>
+    <div class="center-divider"></div>
+    <div class="sobre-grid">
+      <div class="sobre-txt">
+        <p>O <b>Marques Advogados Associados</b> é um escritório dedicado à defesa dos direitos de seus clientes, com atuação sólida em <b>Direito Bancário e Cível</b>.</p>
+        <p>Nossa missão é oferecer um atendimento próximo, transparente e ágil — orientando cada cliente com clareza sobre o seu caso, do primeiro contato até a solução.</p>
+        <p>Trabalhamos com <b>zelo, sigilo e compromisso ético</b>, sempre em conformidade com as normas da OAB.</p>
+      </div>
+      <!-- TROQUE por foto real: substitua a div abaixo por <img src="/painel/escritorio.jpg" class="sobre-img"> -->
+      <div class="sobre-img">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b8935a" stroke-width="1.3"><path d="M3 21h18M4 21V10l8-5 8 5v11M9 21v-6h6v6"/></svg>
+        <span class="tag sans">[espaço para foto do escritório]</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ÁREAS ================= -->
+<section id="areas" style="background:#f0ece5;">
+  <div class="wrap">
+    <div class="eyebrow">O que fazemos</div>
+    <h2>Áreas de atuação</h2>
+    <div class="center-divider"></div>
+    <div class="cards">
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="18" height="12" rx="1"/><path d="M3 8l9-5 9 5M8 20v-6M12 20v-6M16 20v-6"/></svg>
+        <h3>Direito Bancário</h3>
+        <p>Juros abusivos, tarifas indevidas e revisão de contratos.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/></svg>
+        <h3>Ação Revisional</h3>
+        <p>Revisão judicial de cláusulas e encargos abusivos.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="15" height="10" rx="2"/><circle cx="7" cy="19" r="1.6"/><circle cx="15" cy="19" r="1.6"/><path d="M18 10h3l0 4"/></svg>
+        <h3>Busca e Apreensão</h3>
+        <p>Defesa técnica na apreensão de veículos financiados.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+        <h3>CNH — Área Médica</h3>
+        <p>Contestação de suspensão da CNH por questões médicas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EQUIPE ================= -->
+<section id="equipe" class="equipe">
+  <div class="wrap">
+    <div class="eyebrow">Mais sobre a equipe</div>
+    <h2>Nossa equipe</h2>
+    <div class="center-divider"></div>
+    <div class="team">
+      <!-- TROQUE por fotos reais: substitua cada .avatar por <img src="..." class="avatar"> e ajuste nome/cargo -->
+      <div class="member"><div class="avatar">DM</div><h3>Dr. Danilo Marques</h3><div class="role sans">Advogado — Sócio Fundador</div></div>
+      <div class="member"><div class="avatar">MA</div><h3>[Nome do(a) advogado(a)]</h3><div class="role sans">Advogado(a) Associado(a)</div></div>
+      <div class="member"><div class="avatar">AT</div><h3>[Nome]</h3><div class="role sans">Atendimento &amp; Apoio</div></div>
+    </div>
+    <p class="obs sans">Envie as fotos e os nomes reais da equipe para personalizar esta seção.</p>
+    <div class="staff"><a href="/painel">Acesso da equipe →</a></div>
+  </div>
+</section>
+
+<!-- ================= CONTATO / RODAPÉ ================= -->
+<footer id="contato">
+  <div class="wrap">
+    <div class="eyebrow">Contato</div>
+    <h2>Fale com a gente</h2>
+    <div class="center-divider"></div>
     <a class="whats" href="https://wa.me/__WHATSAPP_NUMERO__?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20o%20escrit%C3%B3rio." target="_blank" rel="noopener">
-      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 3C9 3 3.5 8.5 3.5 15.5c0 2.3.6 4.5 1.8 6.4L3 29l7.3-2.2c1.8 1 3.9 1.5 5.7 1.5 7 0 12.5-5.5 12.5-12.5S23 3 16 3zm0 22.6c-1.7 0-3.4-.5-4.8-1.3l-.3-.2-4.3 1.3 1.3-4.2-.2-.3c-1-1.5-1.5-3.3-1.5-5.1 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8z"/>
-        <path d="M21.5 18.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/>
-      </svg>
+      <svg viewBox="0 0 32 32"><path d="M16 3C9 3 3.5 8.5 3.5 15.5c0 2.3.6 4.5 1.8 6.4L3 29l7.3-2.2c1.8 1 3.9 1.5 5.7 1.5 7 0 12.5-5.5 12.5-12.5S23 3 16 3zm0 22.6c-1.7 0-3.4-.5-4.8-1.3l-.3-.2-4.3 1.3 1.3-4.2-.2-.3c-1-1.5-1.5-3.3-1.5-5.1 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8z"/><path d="M21.5 18.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
       Falar no WhatsApp
     </a>
     <div class="num">__WHATSAPP_DISPLAY__</div>
+    <div class="copy">© Marques Advogados Associados — Todos os direitos reservados.</div>
   </div>
+</footer>
+
 </body>
 </html>
