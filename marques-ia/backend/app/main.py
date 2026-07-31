@@ -15,6 +15,7 @@ import logging
 import os
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -54,6 +55,31 @@ app.include_router(agent_health_router)
 _static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/painel", StaticFiles(directory=_static_dir, html=True), name="painel")
 
+_landing_template: str | None = None
+
+
+def _formatar_telefone_br(numero: str) -> str:
+    """Formata um número no padrão brasileiro para exibição (ex.: +55 (11) 99153-7423)."""
+    d = "".join(c for c in (numero or "") if c.isdigit())
+    if len(d) == 13 and d.startswith("55"):
+        return f"+55 ({d[2:4]}) {d[4:9]}-{d[9:]}"
+    if len(d) == 12 and d.startswith("55"):
+        return f"+55 ({d[2:4]}) {d[4:8]}-{d[8:]}"
+    return f"+{d}" if d else (numero or "")
+
+
+def _pagina_inicial_html() -> str:
+    """Carrega a página de boas-vindas e injeta o número de WhatsApp configurado."""
+    global _landing_template
+    if _landing_template is None:
+        with open(os.path.join(_static_dir, "landing.html"), encoding="utf-8") as arquivo:
+            _landing_template = arquivo.read()
+    return (
+        _landing_template
+        .replace("__WHATSAPP_NUMERO__", settings.WHATSAPP_PHONE_NUMBER)
+        .replace("__WHATSAPP_DISPLAY__", _formatar_telefone_br(settings.WHATSAPP_PHONE_NUMBER))
+    )
+
 
 def _criar_admin_padrao(db: Session) -> None:
     existente = db.query(AdminUser).filter(AdminUser.email == settings.ADMIN_DEFAULT_EMAIL).first()
@@ -89,7 +115,13 @@ def startup() -> None:
     )
 
 
-@app.get("/", tags=["status"])
+@app.get("/", response_class=HTMLResponse, tags=["site"])
+def pagina_inicial():
+    """Página pública de boas-vindas: logo do escritório, saudação e botão do WhatsApp."""
+    return HTMLResponse(content=_pagina_inicial_html())
+
+
+@app.get("/status", tags=["status"])
 def status_geral():
     """Endpoint de verificação rápida — confirma que a API e a configuração estão ok."""
     return {

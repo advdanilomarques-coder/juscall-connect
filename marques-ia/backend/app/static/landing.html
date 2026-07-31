@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marques Advogados Associados</title>
+<style>
+  :root { --navy:#12233d; --gold:#b8935a; --cream:#f7f5f1; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1c3358 0%, #12233d 55%, #0d1a2e 100%);
+    color: var(--cream);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;
+  }
+  .card { text-align:center; max-width:540px; width:100%; }
+  .emblem { width:130px; height:130px; margin:0 auto 22px; display:block; }
+  h1 { font-size:clamp(24px,5vw,32px); letter-spacing:1px; color:#fff; margin-bottom:8px; line-height:1.2; }
+  .sub { color:var(--gold); font-size:13px; letter-spacing:4px; text-transform:uppercase;
+         font-family:Arial,Helvetica,sans-serif; margin-bottom:26px; }
+  .divider { width:64px; height:2px; background:var(--gold); margin:0 auto 26px; opacity:.9; }
+  .greeting { font-size:18px; line-height:1.65; color:#dbe1ea; margin-bottom:34px; }
+  .whats {
+    display:inline-flex; align-items:center; gap:11px; background:#25D366; color:#fff;
+    text-decoration:none; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:17px;
+    padding:16px 30px; border-radius:44px; box-shadow:0 10px 24px rgba(0,0,0,.35);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .whats:hover { transform:translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.42); }
+  .whats svg { width:24px; height:24px; fill:#fff; }
+  .num { font-family:Arial,Helvetica,sans-serif; color:#9aa5b5; font-size:14px; margin-top:16px; letter-spacing:.5px; }
+  .painel { display:inline-block; margin-top:46px; color:#5f6b7e; font-family:Arial,Helvetica,sans-serif;
+            font-size:11px; text-decoration:none; letter-spacing:2px; text-transform:uppercase; }
+  .painel:hover { color:var(--gold); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="emblem" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" aria-label="Marques Advogados">
+      <circle cx="65" cy="65" r="61" fill="none" stroke="#b8935a" stroke-width="2"/>
+      <circle cx="65" cy="65" r="52" fill="none" stroke="#b8935a" stroke-width="1" opacity="0.55"/>
+      <!-- balança da justiça -->
+      <g stroke="#b8935a" stroke-width="2.2" fill="none" stroke-linecap="round">
+        <line x1="65" y1="34" x2="65" y2="42"/>
+        <line x1="44" y1="46" x2="86" y2="46"/>
+        <line x1="44" y1="46" x2="38" y2="60"/><line x1="44" y1="46" x2="50" y2="60"/>
+        <path d="M36 60 a8 4 0 0 0 16 0" fill="none"/>
+        <line x1="86" y1="46" x2="80" y2="60"/><line x1="86" y1="46" x2="92" y2="60"/>
+        <path d="M78 60 a8 4 0 0 0 16 0" fill="none"/>
+        <line x1="55" y1="46" x2="75" y2="46"/>
+      </g>
+      <text x="65" y="96" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#b8935a" letter-spacing="2">MA</text>
+    </svg>
+
+    <h1>Marques Advogados Associados</h1>
+    <div class="sub">Direito Bancário &amp; Cível</div>
+    <div class="divider"></div>
+
+    <p class="greeting">
+      Olá! Seja bem-vindo(a). Atendemos com agilidade e total sigilo.
+      Fale conosco agora mesmo — é rápido e sem compromisso.
+    </p>
+
+    <a class="whats" href="https://wa.me/__WHATSAPP_NUMERO__?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20o%20escrit%C3%B3rio." target="_blank" rel="noopener">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 3C9 3 3.5 8.5 3.5 15.5c0 2.3.6 4.5 1.8 6.4L3 29l7.3-2.2c1.8 1 3.9 1.5 5.7 1.5 7 0 12.5-5.5 12.5-12.5S23 3 16 3zm0 22.6c-1.7 0-3.4-.5-4.8-1.3l-.3-.2-4.3 1.3 1.3-4.2-.2-.3c-1-1.5-1.5-3.3-1.5-5.1 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8z"/>
+        <path d="M21.5 18.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/>
+      </svg>
+      Falar no WhatsApp
+    </a>
+    <div class="num">__WHATSAPP_DISPLAY__</div>
+
+    <a class="painel" href="/painel">Acesso da equipe</a>
+  </div>
+</body>
+</html>
