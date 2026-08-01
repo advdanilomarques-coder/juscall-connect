@@ -8,7 +8,7 @@ from app.rag.service import buscar_contexto
 def test_documento_relevante_pontua_mais_que_irrelevante():
     consulta = "juros abusivos no meu financiamento de carro"
     doc_relevante = "Juros abusivos em contratos bancários podem ser revisados quando excedem a média de mercado."
-    doc_irrelevante = "Suspensão de CNH por questões médicas pode ser contestada junto ao DETRAN."
+    doc_irrelevante = "Rescisão do contrato de trabalho e cálculo de verbas rescisórias na Justiça do Trabalho."
 
     score_relevante = pontuar_relevancia(consulta, doc_relevante)
     score_irrelevante = pontuar_relevancia(consulta, doc_irrelevante)
@@ -24,9 +24,9 @@ def test_buscar_contexto_retorna_apenas_documentos_acima_do_limiar(db_session):
         conteudo="Contratos bancários com juros muito acima da média de mercado podem ser revisados judicialmente.",
     ))
     db_session.add(BaseConhecimento(
-        area_juridica="cnh_area_medica",
-        titulo="Suspensão de CNH",
-        conteudo="A suspensão da CNH por exame médico pode ser contestada administrativamente no DETRAN.",
+        area_juridica="outro",
+        titulo="Verbas rescisórias trabalhistas",
+        conteudo="A rescisão do contrato de trabalho gera direito a verbas como aviso prévio e FGTS.",
     ))
     db_session.commit()
 
@@ -41,7 +41,7 @@ def test_buscar_contexto_filtra_por_area_juridica(db_session):
         area_juridica="direito_bancario", titulo="Doc Bancário", conteudo="juros abusivos contrato bancário",
     ))
     db_session.add(BaseConhecimento(
-        area_juridica="cnh_area_medica", titulo="Doc CNH", conteudo="juros abusivos não tem nada a ver com CNH",
+        area_juridica="outro", titulo="Doc Trabalhista", conteudo="juros abusivos não tem relação com rescisão trabalhista",
     ))
     db_session.commit()
 

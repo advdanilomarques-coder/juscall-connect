@@ -21,7 +21,6 @@ AREAS_JURIDICAS = [
     "direito_bancario",
     "acao_revisional",
     "busca_e_apreensao",
-    "cnh_area_medica",
     "outro",
 ]
 

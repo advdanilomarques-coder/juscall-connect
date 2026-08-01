@@ -44,16 +44,6 @@ TRECHOS_INICIAIS = [
             "Prazos processuais são curtos, por isso a rapidez no atendimento inicial é importante."
         ),
     },
-    {
-        "area_juridica": "cnh_area_medica",
-        "titulo": "Suspensão de CNH por questões médicas",
-        "conteudo": (
-            "A suspensão da CNH por resultado de exame médico ou psicológico pode ser contestada "
-            "administrativamente junto ao DETRAN, com pedido de nova perícia ou juntada de laudos "
-            "médicos complementares. Em alguns casos, cabe também medida judicial para suspender os "
-            "efeitos da decisão administrativa até a análise final do recurso."
-        ),
-    },
 ]
 
 
@@ -61,6 +51,11 @@ def main() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
+        # Remove conhecimento de áreas descontinuadas (ex.: CNH — área médica).
+        db.query(BaseConhecimento).filter(
+            BaseConhecimento.area_juridica == "cnh_area_medica"
+        ).delete(synchronize_session=False)
+
         criados = 0
         for trecho in TRECHOS_INICIAIS:
             existe = (
