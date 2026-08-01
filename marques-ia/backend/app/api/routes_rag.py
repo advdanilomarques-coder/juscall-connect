@@ -9,7 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_admin
+from app.api.deps import require_admin as get_current_admin
 from app.core.audit import registrar_log
 from app.database.session import get_db
 from app.models.case import AREAS_JURIDICAS

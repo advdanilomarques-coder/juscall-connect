@@ -9,7 +9,7 @@ import shutil
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_admin
+from app.api.deps import require_admin as get_current_admin
 from app.core.audit import registrar_log
 from app.database.session import get_db
 from app.documents.ocr import LIMIAR_CONFIANCA_BAIXA, processar_documento

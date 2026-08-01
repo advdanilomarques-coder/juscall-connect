@@ -9,7 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_admin
+from app.api.deps import get_current_admin, require_admin
 from app.core.audit import registrar_log
 from app.database.session import get_db
 from app.models.audit_log import LogAuditoria
@@ -92,7 +92,7 @@ def atualizar_cliente(
 def exportar_dados_cliente(
     cliente_id: int,
     db: Session = Depends(get_db),
-    admin: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(require_admin),
 ):
     """Exporta todos os dados pessoais de um cliente (direito de acesso — LGPD art. 18)."""
     cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
@@ -140,7 +140,7 @@ def exportar_dados_cliente(
 def apagar_dados_cliente(
     cliente_id: int,
     db: Session = Depends(get_db),
-    admin: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(require_admin),
 ):
     """Apaga todos os dados de um cliente (direito de exclusão — LGPD art. 18, inciso VI)."""
     cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
@@ -172,7 +172,7 @@ def apagar_dados_cliente(
 def criar_caso(
     payload: CasoCreate,
     db: Session = Depends(get_db),
-    admin: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(require_admin),
 ):
     cliente = db.query(Cliente).filter(Cliente.id == payload.cliente_id).first()
     if not cliente:
@@ -206,7 +206,7 @@ def listar_casos(
     status_filtro: Optional[str] = Query(default=None, alias="status"),
     cliente_id: Optional[int] = None,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
+    _admin: AdminUser = Depends(require_admin),
 ):
     query = db.query(Caso)
     if etapa_funil:
@@ -224,7 +224,7 @@ def listar_casos(
 def obter_caso(
     caso_id: int,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
+    _admin: AdminUser = Depends(require_admin),
 ):
     caso = db.query(Caso).filter(Caso.id == caso_id).first()
     if not caso:
@@ -237,7 +237,7 @@ def atualizar_caso(
     caso_id: int,
     payload: CasoUpdate,
     db: Session = Depends(get_db),
-    admin: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(require_admin),
 ):
     """
     Atualiza um caso — inclusive mover entre etapas do kanban
@@ -275,7 +275,7 @@ def atualizar_caso(
 @router.get("/kanban", response_model=list[KanbanColuna])
 def visao_kanban(
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
+    _admin: AdminUser = Depends(require_admin),
 ):
     """Retorna os casos agrupados por etapa do funil, na ordem padrão do pipeline."""
     colunas = []
@@ -297,7 +297,7 @@ def listar_auditoria(
     entidade: Optional[str] = None,
     limite: int = Query(default=100, le=500),
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
+    _admin: AdminUser = Depends(require_admin),
 ):
     """Lista as entradas mais recentes de auditoria, opcionalmente filtradas por entidade."""
     query = db.query(LogAuditoria)

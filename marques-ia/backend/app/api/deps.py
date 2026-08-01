@@ -30,3 +30,17 @@ def get_current_admin(
         )
 
     return user
+
+
+def require_admin(usuario: AdminUser = Depends(get_current_admin)) -> AdminUser:
+    """
+    Restringe o acesso a usuários com papel 'admin' (o dono).
+    Funcionários (papel 'funcionario') recebem 403 nestas rotas — eles só
+    têm acesso à área de clientes.
+    """
+    if usuario.papel != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso restrito ao administrador.",
+        )
+    return usuario

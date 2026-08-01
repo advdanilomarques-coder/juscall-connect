@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends
 
 from app.agent.ai_client import AIProviderError, generate_reply
-from app.api.deps import get_current_admin
+from app.api.deps import require_admin as get_current_admin
 from app.models.user import AdminUser
 
 router = APIRouter(prefix="/agent", tags=["agente de ia"])

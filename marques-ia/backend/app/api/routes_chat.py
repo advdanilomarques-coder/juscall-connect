@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.agent.service import responder_cliente
-from app.api.deps import get_current_admin
+from app.api.deps import require_admin as get_current_admin
 from app.core.rate_limit import permitir
 from app.database.session import get_db
 from app.models.user import AdminUser

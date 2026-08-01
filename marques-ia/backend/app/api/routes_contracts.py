@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_admin
+from app.api.deps import require_admin as get_current_admin
 from app.contracts.generator import gerar_pdf_contrato
 from app.contracts.templates import TEMPLATES, TIPOS_DISPONIVEIS
 from app.core.audit import registrar_log

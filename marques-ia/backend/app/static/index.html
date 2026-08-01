@@ -117,6 +117,7 @@
     <button data-secao="clientes">Clientes</button>
     <button data-secao="contratos">Contratos</button>
     <button data-secao="auditoria">Auditoria</button>
+    <button data-secao="usuarios">Usuários</button>
   </div>
 
   <div id="secao-kanban" class="painel-secao ativa">
@@ -155,6 +156,35 @@
       <tbody id="tabela-auditoria"></tbody>
     </table>
   </div>
+
+  <div id="secao-usuarios" class="painel-secao">
+    <div class="form-inline">
+      <div>
+        <label for="novo-usuario-nome">Nome</label>
+        <input type="text" id="novo-usuario-nome" placeholder="Nome do funcionário">
+      </div>
+      <div>
+        <label for="novo-usuario-email">E-mail (login)</label>
+        <input type="email" id="novo-usuario-email" placeholder="email@exemplo.com">
+      </div>
+      <div>
+        <label for="novo-usuario-senha">Senha</label>
+        <input type="text" id="novo-usuario-senha" placeholder="mín. 6 caracteres">
+      </div>
+      <div>
+        <label for="novo-usuario-papel">Acesso</label>
+        <select id="novo-usuario-papel">
+          <option value="funcionario">Funcionário (só clientes)</option>
+          <option value="admin">Administrador (tudo)</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" id="btn-criar-usuario">Adicionar</button>
+    </div>
+    <table>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Acesso</th><th>Ações</th></tr></thead>
+      <tbody id="tabela-usuarios"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
@@ -165,6 +195,10 @@ const telaLogin = document.getElementById("tela-login");
 const telaPainel = document.getElementById("tela-painel");
 const btnSair = document.getElementById("btn-sair");
 const aviso = document.getElementById("aviso");
+
+let papel = "admin";
+// Seções visíveis apenas para o administrador (o dono). O funcionário vê só "clientes".
+const SECOES_ADMIN = ["kanban", "contratos", "auditoria", "usuarios"];
 
 const NOMES_ETAPA = {
   novo_lead: "Novo Lead", qualificacao: "Qualificação", documentacao: "Documentação",
@@ -179,11 +213,35 @@ function notificar(texto, ok = true) {
   setTimeout(() => { aviso.style.display = "none"; }, 4000);
 }
 
-function mostrarPainel() {
+async function mostrarPainel() {
   telaLogin.style.display = "none";
   telaPainel.style.display = "block";
   btnSair.style.display = "inline-block";
-  carregarKanban();
+
+  // Confirma o papel do usuário logado (fonte da verdade, funciona também ao recarregar).
+  try {
+    const eu = await apiJson("/auth/me");
+    papel = eu.papel || "funcionario";
+  } catch (e) { return; }
+
+  configurarAcesso();
+}
+
+function configurarAcesso() {
+  const ehAdmin = papel === "admin";
+  // Mostra/esconde os botões das abas conforme o papel.
+  document.querySelectorAll(".abas button").forEach((b) => {
+    const restrita = SECOES_ADMIN.includes(b.dataset.secao);
+    b.style.display = (restrita && !ehAdmin) ? "none" : "inline-block";
+  });
+  // Abre uma aba permitida por padrão.
+  const inicial = ehAdmin ? "kanban" : "clientes";
+  document.querySelectorAll(".abas button").forEach((b) => b.classList.remove("ativa"));
+  document.querySelectorAll(".painel-secao").forEach((s) => s.classList.remove("ativa"));
+  const btnInicial = document.querySelector(`.abas button[data-secao="${inicial}"]`);
+  if (btnInicial) btnInicial.classList.add("ativa");
+  document.getElementById("secao-" + inicial).classList.add("ativa");
+  if (inicial === "kanban") carregarKanban(); else carregarClientes();
 }
 
 function mostrarLogin() {
@@ -256,8 +314,54 @@ document.querySelectorAll(".abas button").forEach((btn) => {
     if (btn.dataset.secao === "clientes") carregarClientes();
     if (btn.dataset.secao === "contratos") carregarContratos();
     if (btn.dataset.secao === "auditoria") carregarAuditoria();
+    if (btn.dataset.secao === "usuarios") carregarUsuarios();
   });
 });
+
+// ==================== USUÁRIOS (somente admin) ====================
+async function carregarUsuarios() {
+  const usuarios = await apiJson("/auth/usuarios");
+  const corpo = document.getElementById("tabela-usuarios");
+  corpo.innerHTML = "";
+  usuarios.forEach((u) => {
+    const acesso = u.papel === "admin" ? "Administrador" : "Funcionário";
+    const linha = document.createElement("tr");
+    linha.innerHTML =
+      `<td>${u.nome || "-"}</td><td>${u.email}</td><td>${acesso}</td>` +
+      `<td><button class="btn">Remover</button></td>`;
+    linha.querySelector("button").addEventListener("click", () => removerUsuario(u));
+    corpo.appendChild(linha);
+  });
+}
+
+document.getElementById("btn-criar-usuario").addEventListener("click", async () => {
+  const nome = document.getElementById("novo-usuario-nome").value.trim();
+  const email = document.getElementById("novo-usuario-email").value.trim();
+  const senha = document.getElementById("novo-usuario-senha").value;
+  const papelNovo = document.getElementById("novo-usuario-papel").value;
+  if (!nome || !email || !senha) { notificar("Preencha nome, e-mail e senha.", false); return; }
+  try {
+    await apiJson("/auth/usuarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, email, senha, papel: papelNovo }),
+    });
+    notificar("Usuário criado com sucesso.");
+    document.getElementById("novo-usuario-nome").value = "";
+    document.getElementById("novo-usuario-email").value = "";
+    document.getElementById("novo-usuario-senha").value = "";
+    carregarUsuarios();
+  } catch (e) { notificar(e.message, false); }
+});
+
+async function removerUsuario(u) {
+  if (!confirm(`Remover o usuário ${u.email}?`)) return;
+  try {
+    await apiJson(`/auth/usuarios/${u.id}`, { method: "DELETE" });
+    notificar("Usuário removido.");
+    carregarUsuarios();
+  } catch (e) { notificar(e.message, false); }
+}
 
 // ==================== KANBAN ====================
 async function carregarKanban() {
