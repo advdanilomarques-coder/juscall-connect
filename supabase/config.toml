@@ -1,1 +1,10 @@
 project_id = "lyjuviasrlmlrijknxbv"
+
+# Envio de mensagens — protegido pelo JWT do Supabase (chamado pelo frontend logado).
+[functions.send-whatsapp]
+verify_jwt = true
+
+# Webhook — a Meta chama sem JWT, então precisa ficar público.
+# A segurança vem do WHATSAPP_VERIFY_TOKEN.
+[functions.whatsapp-webhook]
+verify_jwt = false
