@@ -4,6 +4,8 @@ services:
   - type: web
     name: pedroia-backend
     runtime: docker
+    # The repo root is `juscall-connect`; the project lives in the PedroIA/ subfolder.
+    rootDir: PedroIA
     dockerfilePath: docker/backend.Dockerfile
     dockerContext: .
     healthCheckPath: /api/v1/health
@@ -13,11 +15,14 @@ services:
         value: production
       - key: DEBUG
         value: "false"
+      # Protects the hosted backend. Set a strong value in the dashboard (or let Render generate one).
+      - key: API_KEYS
+        generateValue: true
       - key: DATABASE_URL
         fromDatabase:
           name: pedroia-db
           property: connectionString
-      # Add your model keys as secrets in the Render dashboard:
+      # Add your model keys as secrets in the Render dashboard (at least one):
       # ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY / DEEPSEEK_API_KEY
 
 databases:

@@ -23,9 +23,22 @@
     "assistant"
   ],
   "icon": "media/icon.png",
+  "pricing": "Free",
+  "galleryBanner": {
+    "color": "#0d1018",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/advdanilomarques-coder/juscall-connect"
+  },
+  "homepage": "https://github.com/advdanilomarques-coder/juscall-connect/tree/main/PedroIA",
+  "bugs": {
+    "url": "https://github.com/advdanilomarques-coder/juscall-connect/issues"
+  },
+  "qna": "marketplace",
+  "sponsor": {
+    "url": "https://github.com/advdanilomarques-coder"
   },
   "activationEvents": [
     "onStartupFinished"
@@ -121,12 +134,12 @@
         "pedroia.backendUrl": {
           "type": "string",
           "default": "http://127.0.0.1:8000",
-          "description": "URL do backend do PedroIA (FastAPI)."
+          "description": "URL do backend do PedroIA. Em produção, aponte para o seu servidor hospedado (ex.: https://pedroia-backend.onrender.com)."
         },
         "pedroia.apiKey": {
           "type": "string",
           "default": "",
-          "description": "Chave de API para autenticar no backend do PedroIA (opcional em modo local)."
+          "markdownDescription": "Chave de acesso ao backend hospedado do PedroIA. Obrigatória quando o servidor exige autenticação. Peça a sua chave ao administrador."
         },
         "pedroia.completion.enabled": {
           "type": "boolean",

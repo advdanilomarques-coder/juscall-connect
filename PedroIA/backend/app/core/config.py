@@ -19,6 +19,14 @@ class Settings(BaseSettings):
     # --- Auth ---
     # Comma-separated list of accepted API keys. Empty = auth disabled (local mode).
     api_keys: str = ""
+    # When true, the app refuses to start in production without api_keys set
+    # (prevents an open, billable public backend by accident).
+    require_auth_in_production: bool = True
+
+    # --- Rate limiting (protects a hosted backend from runaway costs) ---
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 30   # requests per client per minute
+    rate_limit_per_day: int = 1000    # requests per client per day
 
     # --- Database / cache ---
     database_url: str = "sqlite+aiosqlite:///./pedroia.db"

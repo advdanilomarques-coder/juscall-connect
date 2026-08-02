@@ -1,48 +1,67 @@
-# PedroIA — Extensão VS Code
+<div align="center">
 
-Seu engenheiro de inteligência artificial dentro do VS Code: chat, autocomplete inline
-e comandos para criar, corrigir, explicar e refatorar código.
+<img src="media/icon.png" width="120" alt="PedroIA" />
 
-## Recursos
+# PedroIA
 
-- **Chat lateral** (Ctrl/Cmd+Shift+I) com histórico e seleção de modo (Auto / Cloud / Local).
-- **Autocomplete inline** (PedroIA Code Completion Engine) — sugestões estilo Copilot.
-- **Comandos** no menu de contexto e na paleta:
-  - `/create` — criar projeto/código
-  - `/explain` — explicar código
-  - `/fix` — corrigir erros
-  - `/refactor` — melhorar código
-  - `/test` — criar testes
-  - `/security` — analisar segurança
-- **Contexto automático**: lê o arquivo ativo, a seleção, os diagnósticos e o workspace —
-  você não precisa colar prompts gigantes.
+### Seu engenheiro de inteligência artificial dentro do VS Code
 
-## Como funciona
+Chat, autocomplete e comandos que entendem o seu projeto — cria, corrige, explica e refatora código.
 
-A extensão é um cliente fino que fala com o **backend PedroIA** (FastAPI). O backend decide
-qual modelo usar (nuvem quando há internet, Ollama local quando offline).
+</div>
 
-## Desenvolvimento
+---
 
-```bash
-npm install
-npm run esbuild      # ou: npm run watch
-# Pressione F5 no VS Code para abrir uma janela de desenvolvimento
-```
+> **Adicione aqui um GIF/print da extensão em ação** (`media/demo.gif`).
+> Ex.: o chat respondendo, o autocomplete sugerindo, o menu de contexto.
+> Extensões com uma boa demonstração recebem muito mais instalações.
 
-Configure em **Settings → PedroIA**:
+## ✨ O que o PedroIA faz
 
-- `pedroia.backendUrl` (padrão `http://127.0.0.1:8000`)
-- `pedroia.apiKey` (opcional em modo local)
-- `pedroia.preferredMode` (`auto` / `cloud` / `local`)
-- `pedroia.completion.enabled`
+- **💬 Chat integrado** — converse com um engenheiro sênior sem sair do editor, com histórico e memória.
+- **⚡ Autocomplete inline** — sugestões enquanto você digita, no estilo Copilot.
+- **🛠️ Comandos** — `/create`, `/explain`, `/fix`, `/refactor`, `/test`, `/security` na paleta e no menu de contexto.
+- **🧠 Contexto automático** — lê o arquivo ativo, a seleção e os erros. Sem prompts gigantes.
+- **🔌 Vários modelos** — Claude, OpenAI, Gemini, DeepSeek e modelos locais (Ollama).
 
-## Empacotar (.vsix)
+## 🚀 Começando
 
-```bash
-npm install -g @vscode/vsce
-vsce package
-```
+1. Instale a extensão.
+2. Abra as **Configurações** → procure por **PedroIA**.
+3. Preencha:
+   - `pedroia.backendUrl` — o endereço do serviço PedroIA.
+   - `pedroia.apiKey` — a sua chave de acesso (se o serviço exigir).
+4. Clique no ícone do **PedroIA** na barra lateral e comece a conversar.
 
-> Observação: para publicar, adicione um `media/icon.png` (128×128). O ícone da barra lateral
-> já é fornecido como SVG.
+Atalho do chat: **Ctrl+Shift+I** (Mac: **Cmd+Shift+I**).
+
+## ⚙️ Configurações
+
+| Configuração                    | Padrão                     | Descrição                              |
+|---------------------------------|----------------------------|----------------------------------------|
+| `pedroia.backendUrl`            | `http://127.0.0.1:8000`    | Endereço do serviço PedroIA            |
+| `pedroia.apiKey`                | vazio                      | Chave de acesso ao serviço             |
+| `pedroia.preferredMode`         | `auto`                     | `auto` / `cloud` / `local`             |
+| `pedroia.completion.enabled`    | `true`                     | Liga/desliga o autocomplete            |
+| `pedroia.completion.debounceMs` | `350`                      | Atraso antes de sugerir                |
+
+## 🧩 Comandos
+
+| Comando            | O que faz                          |
+|--------------------|------------------------------------|
+| `PedroIA: Abrir Chat`         | Abre o chat na barra lateral  |
+| `/create`          | Cria projeto ou código             |
+| `/explain`         | Explica o código selecionado       |
+| `/fix`             | Corrige erros                      |
+| `/refactor`        | Melhora o código                   |
+| `/test`            | Cria testes automatizados          |
+| `/security`        | Analisa vulnerabilidades           |
+
+## 🔒 Privacidade
+
+O código enviado para análise é processado pelo serviço PedroIA configurado em `backendUrl`
+e pelo provedor de IA escolhido. Use um serviço de sua confiança e não envie segredos.
+
+## 📄 Licença
+
+[MIT](../LICENSE) · Feito para desenvolvedores.
