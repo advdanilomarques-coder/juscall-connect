@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PedroIA — CRM / Monitoramento</title>
+  <style>
+    :root { --bg:#0b0d12; --panel:#12151d; --border:#232838; --text:#e6e8ee; --muted:#9aa3b2; --accent:#7c5cff; --ok:#3fb950; --err:#f85149; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:28px; }
+    h1 { font-size:22px; margin-bottom:4px; }
+    .sub { color:var(--muted); margin-bottom:24px; font-size:14px; }
+    .row { display:flex; gap:10px; align-items:center; margin-bottom:20px; flex-wrap:wrap; }
+    input { background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px; width:280px; }
+    button { background:var(--accent); color:#0b0d12; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:26px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; }
+    .card .k { color:var(--muted); font-size:13px; }
+    .card .v { font-size:28px; font-weight:700; margin-top:6px; }
+    table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    th, td { text-align:left; padding:10px 12px; font-size:13px; border-bottom:1px solid var(--border); }
+    th { color:var(--muted); font-weight:600; }
+    .ok { color:var(--ok); } .err { color:var(--err); }
+    .status { font-size:13px; color:var(--muted); margin-left:auto; }
+  </style>
+</head>
+<body>
+  <h1>PedroIA · CRM / Monitoramento</h1>
+  <div class="sub">Usuários, uso, provedores e falhas do agente.</div>
+
+  <div class="row">
+    <input id="url" value="http://127.0.0.1:8000" />
+    <button onclick="load()">Atualizar</button>
+    <span class="status" id="status">—</span>
+  </div>
+
+  <div class="cards" id="cards"></div>
+  <table>
+    <thead><tr><th>Quando</th><th>Tipo</th><th>Provedor</th><th>Modelo</th><th>Modo</th><th>Status</th><th>Detalhe</th></tr></thead>
+    <tbody id="logs"><tr><td colspan="7" style="color:var(--muted)">Clique em Atualizar…</td></tr></tbody>
+  </table>
+
+  <script>
+    async function load() {
+      const base = document.getElementById('url').value.replace(/\/+$/, '');
+      const status = document.getElementById('status');
+      try {
+        const [s, l] = await Promise.all([
+          fetch(base + '/api/v1/crm/summary').then(r => r.json()),
+          fetch(base + '/api/v1/crm/logs?limit=50').then(r => r.json()),
+        ]);
+        renderCards(s);
+        renderLogs(l);
+        status.textContent = 'Atualizado ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        status.textContent = 'Erro ao conectar: ' + e.message;
+      }
+    }
+    function renderCards(s) {
+      const providers = Object.entries(s.by_provider || {}).map(([k,v]) => `${k}: ${v}`).join(' · ') || '—';
+      document.getElementById('cards').innerHTML = `
+        <div class="card"><div class="k">Requisições</div><div class="v">${s.requests_total}</div></div>
+        <div class="card"><div class="k">Erros</div><div class="v" style="color:var(--err)">${s.errors_total}</div></div>
+        <div class="card"><div class="k">Conversas</div><div class="v">${s.conversations_total}</div></div>
+        <div class="card"><div class="k">Por provedor</div><div class="v" style="font-size:14px;font-weight:500">${providers}</div></div>`;
+    }
+    function renderLogs(rows) {
+      const esc = (s) => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      document.getElementById('logs').innerHTML = rows.length ? rows.map(r => `
+        <tr>
+          <td>${esc((r.created_at || '').replace('T',' ').slice(0,19))}</td>
+          <td>${esc(r.kind)}</td><td>${esc(r.provider)}</td><td>${esc(r.model)}</td><td>${esc(r.mode)}</td>
+          <td class="${r.status === 'ok' ? 'ok' : 'err'}">${esc(r.status)}</td>
+          <td>${esc(r.detail)}</td>
+        </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted)">Sem registros.</td></tr>';
+    }
+  </script>
+</body>
+</html>

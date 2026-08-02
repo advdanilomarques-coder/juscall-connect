@@ -1,0 +1,167 @@
+{
+  "name": "pedroia",
+  "displayName": "PedroIA — AI Software Engineer",
+  "description": "PedroIA — Seu engenheiro de inteligência artificial dentro do VS Code. Chat, autocomplete e comandos para criar, corrigir e refatorar código.",
+  "version": "0.1.0",
+  "publisher": "pedroia",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "autocomplete",
+    "chat",
+    "llm",
+    "assistant"
+  ],
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/advdanilomarques-coder/juscall-connect"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "pedroia-sidebar",
+          "title": "PedroIA",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "pedroia-sidebar": [
+        {
+          "type": "webview",
+          "id": "pedroia.chatView",
+          "name": "Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "pedroia.openChat",
+        "title": "PedroIA: Abrir Chat",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.create",
+        "title": "PedroIA: Criar projeto / código (/create)",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.explain",
+        "title": "PedroIA: Explicar código (/explain)",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.fix",
+        "title": "PedroIA: Corrigir erro (/fix)",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.refactor",
+        "title": "PedroIA: Melhorar código (/refactor)",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.test",
+        "title": "PedroIA: Criar testes (/test)",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.security",
+        "title": "PedroIA: Analisar segurança (/security)",
+        "category": "PedroIA"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "pedroia.submenu",
+          "group": "navigation@9"
+        }
+      ],
+      "pedroia.submenu": [
+        { "command": "pedroia.explain", "group": "1_ai@1" },
+        { "command": "pedroia.fix", "group": "1_ai@2" },
+        { "command": "pedroia.refactor", "group": "1_ai@3" },
+        { "command": "pedroia.test", "group": "1_ai@4" },
+        { "command": "pedroia.security", "group": "1_ai@5" }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "pedroia.submenu",
+        "label": "PedroIA"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "pedroia.openChat",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i"
+      }
+    ],
+    "configuration": {
+      "title": "PedroIA",
+      "properties": {
+        "pedroia.backendUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8000",
+          "description": "URL do backend do PedroIA (FastAPI)."
+        },
+        "pedroia.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Chave de API para autenticar no backend do PedroIA (opcional em modo local)."
+        },
+        "pedroia.completion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Habilitar o autocomplete inline (PedroIA Code Completion Engine)."
+        },
+        "pedroia.completion.debounceMs": {
+          "type": "number",
+          "default": 350,
+          "description": "Tempo de espera (ms) antes de solicitar uma sugestão de autocomplete."
+        },
+        "pedroia.preferredMode": {
+          "type": "string",
+          "enum": ["auto", "cloud", "local"],
+          "default": "auto",
+          "description": "Estratégia de seleção de modelo: auto (online→cloud / offline→local), cloud (sempre nuvem) ou local (sempre Ollama)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "node ./esbuild.js --production",
+    "esbuild": "node ./esbuild.js",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.0"
+  }
+}

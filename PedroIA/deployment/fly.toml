@@ -1,0 +1,30 @@
+# Fly.io app config for the PedroIA backend.
+# Deploy: fly launch --dockerfile docker/backend.Dockerfile  (then `fly deploy`)
+app = "pedroia-backend"
+primary_region = "gru"  # São Paulo
+
+[build]
+  dockerfile = "docker/backend.Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  DEBUG = "false"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/api/v1/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

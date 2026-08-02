@@ -1,0 +1,25 @@
+# --- Core web ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# --- HTTP client for LLM providers ---
+httpx==0.28.1
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+aiosqlite==0.20.0
+# PostgreSQL (production) — uncomment to use:
+# asyncpg==0.30.0
+
+# --- Cache / queues (optional) ---
+redis==5.2.1
+
+# --- RAG / LLM orchestration (optional, used as the project grows) ---
+# langchain==0.3.14
+# llama-index==0.12.10
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.2

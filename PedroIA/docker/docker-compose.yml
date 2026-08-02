@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    container_name: pedroia-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://pedroia:pedroia@db:5432/pedroia
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: pedroia-db
+    environment:
+      POSTGRES_USER: pedroia
+      POSTGRES_PASSWORD: pedroia
+      POSTGRES_DB: pedroia
+    volumes:
+      - pedroia_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: pedroia-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # Optional local model server. Uncomment to run Ollama alongside the stack.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: pedroia-ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - pedroia_ollama:/root/.ollama
+  #   restart: unless-stopped
+
+volumes:
+  pedroia_pgdata:
+  # pedroia_ollama:

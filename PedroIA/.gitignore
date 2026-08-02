@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+dist/
+*.vsix
+*.log
+
+# Env / secrets
+.env
+!.env.example
+
+# OS / editor
+.DS_Store
+.vscode-test/
