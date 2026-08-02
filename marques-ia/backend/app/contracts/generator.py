@@ -20,8 +20,10 @@ from app.contracts.templates import TEMPLATES
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "storage", "contratos")
 
 # Dados do escritório usados no cabeçalho e nos contratos.
-NOME_ESCRITORIO = "Marques Advogados Associados"
-CIDADE_PADRAO = "São Paulo/SP"  # troque pela comarca do escritório, se desejar.
+NOME_ESCRITORIO = "Marques Advocacia"
+ADVOGADO_RESPONSAVEL = "Dr. Danilo Barbosa Marques — OAB/SP 467.790"
+ENDERECO_ESCRITORIO = "Rua Joseph Zarour, 93, Sala 1805, Centro — Guarulhos/SP"
+CIDADE_PADRAO = "Guarulhos/SP"
 
 _MESES = [
     "janeiro", "fevereiro", "março", "abril", "maio", "junho",
@@ -102,7 +104,7 @@ def gerar_pdf_contrato(
 
     story = [
         Paragraph(NOME_ESCRITORIO, styles["Escritorio"]),
-        Paragraph("Advocacia — Direito Bancário e Cível", styles["EscritorioSub"]),
+        Paragraph(f"{ADVOGADO_RESPONSAVEL}<br/>{ENDERECO_ESCRITORIO}", styles["EscritorioSub"]),
         Paragraph(template["titulo"], styles["TituloContrato"]),
         Paragraph(f"Contrato nº {numero}", styles["Normal"]),
         Spacer(1, 16),
@@ -114,10 +116,14 @@ def gerar_pdf_contrato(
     # Campos de assinatura.
     story.append(Spacer(1, 44))
     story.append(Paragraph("_______________________________________", styles["Assinatura"]))
-    story.append(Paragraph(f"{nome_cliente or 'CONTRATANTE'}<br/>CONTRATANTE", styles["Assinatura"]))
+    story.append(Paragraph(f"{nome_cliente or '[Nome / Razão Social]'}<br/>CONTRATANTE", styles["Assinatura"]))
     story.append(Spacer(1, 28))
     story.append(Paragraph("_______________________________________", styles["Assinatura"]))
-    story.append(Paragraph(f"{NOME_ESCRITORIO}<br/>CONTRATADO", styles["Assinatura"]))
+    story.append(Paragraph(f"Danilo Barbosa Marques — OAB/SP 467.790<br/>CONTRATADO ({NOME_ESCRITORIO})", styles["Assinatura"]))
+    story.append(Spacer(1, 24))
+    story.append(Paragraph("Testemunha 1: _______________________  CPF: ______________", styles["Assinatura"]))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph("Testemunha 2: _______________________  CPF: ______________", styles["Assinatura"]))
 
     story.append(Spacer(1, 30))
     story.append(Paragraph(
