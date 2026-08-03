@@ -1,0 +1,30 @@
+# ======================================================================
+# Render Blueprint — PedroIA backend
+# Ao criar um "Blueprint" no Render apontando para este repositório,
+# defina o Root Directory como "PedroIA" (onde este arquivo está).
+# ======================================================================
+services:
+  - type: web
+    name: pedroia-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # ANTHROPIC_API_KEY: defina no painel do Render (Environment) — NÃO coloque aqui.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # API_KEYS: defina no painel do Render — chaves de acesso da extensão.
+      - key: API_KEYS
+        sync: false
+      - key: PEDROIA_MODEL
+        value: claude-opus-5
+      - key: RATE_LIMIT_MAX
+        value: "3"
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "60000"

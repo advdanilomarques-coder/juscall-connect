@@ -1,0 +1,23 @@
+# Dependências
+node_modules/
+**/node_modules/
+
+# Build
+dist/
+extension/out/
+*.vsix
+
+# Segredos — NUNCA versionar
+.env
+**/.env
+!**/.env.example
+
+# Next.js (site)
+web/.next/
+web/out/
+web/node_modules/
+web/next-env.d.ts
+
+# Logs / SO
+*.log
+.DS_Store

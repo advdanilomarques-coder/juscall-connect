@@ -1,0 +1,104 @@
+{
+  "name": "pedroia",
+  "displayName": "PedroIA — Engenheiro de IA no VS Code",
+  "description": "Seu engenheiro de software com IA dentro do VS Code: chat, explicação de código e autocomplete estilo Copilot.",
+  "version": "0.1.0",
+  "publisher": "SEU_PUBLISHER",
+  "icon": "icon.png",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Machine Learning", "Programming Languages", "Other"],
+  "keywords": ["ai", "copilot", "autocomplete", "assistant", "claude", "pedroia"],
+  "galleryBanner": {
+    "color": "#0b0b14",
+    "theme": "dark"
+  },
+  "homepage": "https://pedroia.dev",
+  "bugs": {
+    "url": "https://github.com/SEU_USUARIO/pedroia/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SEU_USUARIO/pedroia.git"
+  },
+  "sponsor": {
+    "url": "https://github.com/sponsors/SEU_USUARIO"
+  },
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pedroia.ask",
+        "title": "PedroIA: Perguntar / Abrir chat",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.explainSelection",
+        "title": "PedroIA: Explicar seleção",
+        "category": "PedroIA"
+      },
+      {
+        "command": "pedroia.toggleAutocomplete",
+        "title": "PedroIA: Ativar/desativar autocomplete",
+        "category": "PedroIA"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "pedroia.explainSelection",
+          "when": "editorHasSelection",
+          "group": "pedroia@1"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "pedroia.ask",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p"
+      }
+    ],
+    "configuration": {
+      "title": "PedroIA",
+      "properties": {
+        "pedroia.backendUrl": {
+          "type": "string",
+          "default": "https://pedroia-backend.onrender.com",
+          "description": "URL do backend do PedroIA (ex.: o serviço no Render)."
+        },
+        "pedroia.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Chave de acesso da extensão (uma das definidas em `API_KEYS` no backend)."
+        },
+        "pedroia.enableAutocomplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ativa o autocomplete inline estilo Copilot."
+        },
+        "pedroia.autocompleteDebounceMs": {
+          "type": "number",
+          "default": 400,
+          "description": "Tempo de espera (ms) antes de pedir uma sugestão de autocomplete."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.7.2",
+    "@vscode/vsce": "^3.2.1"
+  }
+}

@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-space: "Space Grotesk", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #05050a;
+  color: #e8ecff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gradiente de texto IA */
+.text-gradient {
+  background: linear-gradient(100deg, #7c3aed 0%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow {
+  box-shadow: 0 0 40px -8px rgba(124, 58, 237, 0.6),
+    0 0 80px -20px rgba(34, 211, 238, 0.35);
+}
+
+.grid-bg {
+  background-image: linear-gradient(rgba(124, 58, 237, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.btn-primary {
+  @apply inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-semibold text-ink transition;
+  background: linear-gradient(100deg, #7c3aed, #22d3ee);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -8px rgba(34, 211, 238, 0.5);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center gap-2 rounded-full border border-white/15 px-7 py-3.5 font-medium text-frost/90 transition;
+}
+.btn-ghost:hover {
+  border-color: rgba(34, 211, 238, 0.6);
+  background: rgba(34, 211, 238, 0.06);
+}
+
+/* Barra de rolagem discreta */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #05050a; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#7c3aed, #22d3ee);
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
