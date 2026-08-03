@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import chat, complete, crm, health
+from app.api.routes import chat, complete, crm, diag, health
 from app.core.config import get_settings
 from app.core.logging import get_logger, setup_logging
 from app.core.ratelimit import RateLimitMiddleware
@@ -52,6 +52,7 @@ app.include_router(health.router, prefix=settings.api_prefix)
 app.include_router(chat.router, prefix=settings.api_prefix)
 app.include_router(complete.router, prefix=settings.api_prefix)
 app.include_router(crm.router, prefix=settings.api_prefix)
+app.include_router(diag.router, prefix=settings.api_prefix)
 
 
 @app.get("/")
