@@ -37,11 +37,19 @@ async def diag() -> dict:
     results: dict = {
         "online": internet_available(),
         "resolved_models": {
+            "groq": settings.groq_model,
             "gemini": settings.gemini_model,
             "openai": settings.openai_model,
             "anthropic": settings.anthropic_model,
             "deepseek": settings.deepseek_model,
             "ollama": settings.ollama_model,
+        },
+        "keys_present": {
+            "groq": bool(settings.groq_api_key),
+            "gemini": bool(settings.gemini_api_key),
+            "openai": bool(settings.openai_api_key),
+            "anthropic": bool(settings.anthropic_api_key),
+            "deepseek": bool(settings.deepseek_api_key),
         },
         "providers": {},
     }
