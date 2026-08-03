@@ -48,3 +48,16 @@ class DeepSeekProvider(OpenAIProvider):
             base_url="https://api.deepseek.com/v1",
             name="deepseek",
         )
+
+
+class GroqProvider(OpenAIProvider):
+    """Groq is OpenAI-API compatible; generous free tier, no billing required."""
+
+    def __init__(self):
+        s = get_settings()
+        super().__init__(
+            api_key=s.groq_api_key,
+            model=s.groq_model,
+            base_url="https://api.groq.com/openai/v1",
+            name="groq",
+        )

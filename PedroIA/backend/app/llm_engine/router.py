@@ -21,6 +21,7 @@ from .providers import (
     DeepSeekProvider,
     FallbackProvider,
     GeminiProvider,
+    GroqProvider,
     LLMProvider,
     LLMResult,
     Message,
@@ -47,6 +48,7 @@ class ModelRouter:
         self._cloud: Dict[str, LLMProvider] = {
             "anthropic": AnthropicProvider(),
             "openai": OpenAIProvider(),
+            "groq": GroqProvider(),
             "gemini": GeminiProvider(),
             "deepseek": DeepSeekProvider(),
         }

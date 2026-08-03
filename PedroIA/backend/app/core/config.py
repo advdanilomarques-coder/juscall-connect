@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.0-flash"
     deepseek_api_key: str = ""
     deepseek_model: str = "deepseek-chat"
+    # Groq — generous free tier, no billing required (OpenAI-compatible API).
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # --- LLM: local (Ollama) ---
     ollama_base_url: str = "http://localhost:11434"
@@ -48,7 +51,7 @@ class Settings(BaseSettings):
     ollama_completion_model: str = "qwen2.5-coder:1.5b"
 
     # Priority order for cloud providers when mode=auto/cloud.
-    cloud_priority: List[str] = Field(default_factory=lambda: ["anthropic", "openai", "gemini", "deepseek"])
+    cloud_priority: List[str] = Field(default_factory=lambda: ["anthropic", "openai", "groq", "gemini", "deepseek"])
 
     @property
     def allowed_api_keys(self) -> List[str]:

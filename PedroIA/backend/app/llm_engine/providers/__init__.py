@@ -1,5 +1,5 @@
 from .base import LLMProvider, LLMResult, Message, ProviderError
-from .openai_provider import OpenAIProvider, DeepSeekProvider
+from .openai_provider import OpenAIProvider, DeepSeekProvider, GroqProvider
 from .anthropic_provider import AnthropicProvider
 from .gemini_provider import GeminiProvider
 from .ollama_provider import OllamaProvider
@@ -12,6 +12,7 @@ __all__ = [
     "ProviderError",
     "OpenAIProvider",
     "DeepSeekProvider",
+    "GroqProvider",
     "AnthropicProvider",
     "GeminiProvider",
     "OllamaProvider",
