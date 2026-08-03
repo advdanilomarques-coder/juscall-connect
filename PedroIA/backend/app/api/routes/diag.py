@@ -1,6 +1,7 @@
 """Diagnostic endpoint: tries a real call on each configured provider and
 reports the raw error. Makes it easy to see WHY a provider falls back
 (wrong model, invalid key, API not enabled, region, quota, etc.)."""
+import httpx
 from fastapi import APIRouter, Depends
 
 from app.auth.security import require_api_key
@@ -9,6 +10,24 @@ from app.llm_engine.providers import Message
 from app.llm_engine.router import get_router, internet_available
 
 router = APIRouter(tags=["diag"], dependencies=[Depends(require_api_key)])
+
+
+async def _gemini_models(api_key: str) -> list[str]:
+    """Lists Gemini models this key can use for text generation."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}&pageSize=100"
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(url)
+        if resp.status_code >= 400:
+            return [f"(erro ao listar: {resp.status_code} {resp.text[:120]})"]
+        data = resp.json()
+        names = []
+        for m in data.get("models", []):
+            if "generateContent" in m.get("supportedGenerationMethods", []):
+                names.append(m.get("name", "").replace("models/", ""))
+        return names
+    except Exception as e:  # noqa: BLE001
+        return [f"(exceção: {str(e)[:120]})"]
 
 
 @router.get("/diag")
@@ -42,4 +61,9 @@ async def diag() -> dict:
 
     if not results["providers"]:
         results["note"] = "Nenhum provedor de nuvem com chave configurada foi encontrado."
+
+    # If a Gemini key is set, list the models it can actually use.
+    if settings.gemini_api_key:
+        results["gemini_available_models"] = await _gemini_models(settings.gemini_api_key)
+
     return results
