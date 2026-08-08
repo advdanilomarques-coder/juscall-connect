@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import chat, complete, crm, diag, health
+from app.api.routes import auth, chat, complete, crm, diag, health
 from app.core.config import get_settings
 from app.core.logging import get_logger, setup_logging
 from app.core.ratelimit import RateLimitMiddleware
@@ -43,12 +43,15 @@ app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=True,
+    # Auth is via Authorization header (not cookies), so credentials aren't needed.
+    # This keeps "*" origins valid for the public website.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(health.router, prefix=settings.api_prefix)
+app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(chat.router, prefix=settings.api_prefix)
 app.include_router(complete.router, prefix=settings.api_prefix)
 app.include_router(crm.router, prefix=settings.api_prefix)

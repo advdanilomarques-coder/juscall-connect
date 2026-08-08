@@ -15,7 +15,7 @@ def test_detect_slash():
 
 def test_system_prompt_includes_slash_guidance():
     prompt = build_system_prompt("/test crie testes", "Arquivo: a.py")
-    assert "PedroIA" in prompt
+    assert "Clean Code" in prompt
     assert "testes" in prompt.lower()
     assert "Arquivo: a.py" in prompt
 

@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     # (prevents an open, billable public backend by accident).
     require_auth_in_production: bool = True
 
+    # --- User accounts / JWT (for the website login) ---
+    jwt_secret: str = "change-me-in-production"
+    jwt_expire_minutes: int = 10080  # 7 days
+    allow_signup: bool = True
+
     # --- Rate limiting (protects a hosted backend from runaway costs) ---
     rate_limit_enabled: bool = True
     rate_limit_per_minute: int = 30   # requests per client per minute

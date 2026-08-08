@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas import ChatRequest, ChatResponse
-from app.auth.security import require_api_key
+from app.auth.security import require_access
 from app.database.session import get_session
 from app.llm_engine.prompts import build_system_prompt, format_context
 from app.llm_engine.providers import Message
@@ -10,7 +10,7 @@ from app.llm_engine.router import get_router
 from app.memory.store import save_turn
 from app.monitoring.usage import log_usage
 
-router = APIRouter(tags=["chat"], dependencies=[Depends(require_api_key)])
+router = APIRouter(tags=["chat"], dependencies=[Depends(require_access)])
 
 
 @router.post("/chat", response_model=ChatResponse)

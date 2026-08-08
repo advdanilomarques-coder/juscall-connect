@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas import CompletionRequest, CompletionResponse
-from app.auth.security import require_api_key
+from app.auth.security import require_access
 from app.database.session import get_session
 from app.llm_engine.router import get_router
 from app.monitoring.usage import log_usage
 
-router = APIRouter(tags=["completion"], dependencies=[Depends(require_api_key)])
+router = APIRouter(tags=["completion"], dependencies=[Depends(require_access)])
 
 
 @router.post("/complete", response_model=CompletionResponse)
