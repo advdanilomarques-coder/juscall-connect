@@ -16,16 +16,16 @@ export class CompletionProvider implements vscode.InlineCompletionItemProvider {
   constructor(private readonly client: PedroIAClient) {}
 
   private get enabled(): boolean {
-    return vscode.workspace.getConfiguration("pedroia").get<boolean>("completion.enabled", true);
+    return vscode.workspace.getConfiguration("cleancode").get<boolean>("completion.enabled", true);
   }
 
   private get debounceMs(): number {
-    return vscode.workspace.getConfiguration("pedroia").get<number>("completion.debounceMs", 350);
+    return vscode.workspace.getConfiguration("cleancode").get<number>("completion.debounceMs", 350);
   }
 
   private get mode(): "auto" | "cloud" | "local" {
     return (
-      (vscode.workspace.getConfiguration("pedroia").get<string>("preferredMode") as
+      (vscode.workspace.getConfiguration("cleancode").get<string>("preferredMode") as
         | "auto"
         | "cloud"
         | "local") || "auto"

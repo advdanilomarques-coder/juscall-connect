@@ -26,6 +26,13 @@ SLASH_COMMANDS: Dict[str, str] = {
     "/melhorar": "Refatore melhorando legibilidade, desempenho e manutenção, preservando o comportamento.",
     "/test": "Gere testes automatizados cobrindo casos felizes e de borda, usando o framework idiomático.",
     "/security": "Faça uma análise de segurança: liste vulnerabilidades, severidade e correções recomendadas.",
+    "/document": "Gere documentação para o código: docstrings/JSDoc no padrão da linguagem e, se útil, um resumo curto.",
+    "/optimize": "Otimize o desempenho do código. Aponte os gargalos e mostre a versão otimizada, citando o ganho.",
+    "/review": "Faça um code review de dev sênior: liste pontos por severidade (bug, risco, estilo) e sugira correções.",
+    "/comment": "Adicione comentários claros e concisos explicando as partes não óbvias do código. Não mude a lógica.",
+    "/convert": "Converta o código para a linguagem pedida, mantendo o comportamento e usando o estilo idiomático do destino.",
+    "/terminal": "O usuário colou saída de terminal. Diagnostique o problema e responda com o COMANDO exato para resolver, curtinho.",
+    "/commit": "Gere uma mensagem de commit no padrão Conventional Commits (tipo: descrição), curta e no imperativo.",
 }
 
 

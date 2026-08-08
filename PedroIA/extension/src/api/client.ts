@@ -50,7 +50,7 @@ export interface ProjectContext {
  */
 export class PedroIAClient {
   private get config() {
-    return vscode.workspace.getConfiguration("pedroia");
+    return vscode.workspace.getConfiguration("cleancode");
   }
 
   private get baseUrl(): string {
@@ -131,7 +131,7 @@ export class PedroIAClient {
 
       req.on("timeout", () => req.destroy(new Error("Tempo limite ao contatar o backend do PedroIA.")));
       req.on("error", (err) =>
-        reject(new Error(`Não foi possível contatar o backend em ${this.baseUrl}. ${err.message}`))
+        reject(new Error(`Não foi possível contatar o servidor em ${this.baseUrl}. ${err.message}`))
       );
 
       if (payload) {

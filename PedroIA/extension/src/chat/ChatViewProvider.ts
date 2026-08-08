@@ -13,7 +13,7 @@ interface WebviewMessage {
  * Copilot Chat / Claude Code. Keeps an in-memory history for the session.
  */
 export class ChatViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = "pedroia.chatView";
+  public static readonly viewType = "cleancode.chatView";
 
   private view?: vscode.WebviewView;
   private history: ChatMessage[] = [];
@@ -47,21 +47,30 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  /** Public entry so commands can push a prompt into the chat. */
+  /** Public entry so commands can push a prompt into the chat (and send it). */
   public async ask(prompt: string): Promise<void> {
-    if (!this.view) {
-      await vscode.commands.executeCommand("pedroia.chatView.focus");
-      // Give the webview a moment to resolve.
-      await new Promise((r) => setTimeout(r, 300));
-    }
-    this.view?.show?.(true);
+    await this.reveal();
     this.post({ type: "userEcho", text: prompt });
     await this.handleUserMessage(prompt, this.preferredMode());
   }
 
+  /** Opens the chat and pre-fills the input with text (does NOT send) — "ask about my code". */
+  public async prefill(text: string): Promise<void> {
+    await this.reveal();
+    this.post({ type: "prefill", text });
+  }
+
+  private async reveal(): Promise<void> {
+    if (!this.view) {
+      await vscode.commands.executeCommand("cleancode.chatView.focus");
+      await new Promise((r) => setTimeout(r, 350));
+    }
+    this.view?.show?.(true);
+  }
+
   private preferredMode(): "auto" | "cloud" | "local" {
     return (
-      (vscode.workspace.getConfiguration("pedroia").get<string>("preferredMode") as
+      (vscode.workspace.getConfiguration("cleancode").get<string>("preferredMode") as
         | "auto"
         | "cloud"
         | "local") || "auto"
@@ -124,15 +133,16 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   <meta http-equiv="Content-Security-Policy" content="${csp}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="${styleUri}" rel="stylesheet" />
-  <title>PedroIA</title>
+  <title>Clean Code</title>
 </head>
 <body>
   <header id="statusBar" class="status">Conectando…</header>
   <main id="messages" class="messages">
     <div class="welcome">
-      <strong>PedroIA</strong>
-      <p>Seu engenheiro de IA dentro do VS Code. Peça para criar, corrigir, explicar ou refatorar código.</p>
-      <p class="hint">Comandos: <code>/create</code> <code>/explain</code> <code>/fix</code> <code>/refactor</code> <code>/test</code> <code>/security</code></p>
+      <strong>Clean Code</strong>
+      <p>Seu assistente de IA no VS Code. Peça para criar, corrigir, explicar, refatorar, documentar ou revisar código — em qualquer linguagem.</p>
+      <p class="hint">Comandos: <code>/create</code> <code>/explain</code> <code>/fix</code> <code>/refactor</code> <code>/test</code> <code>/document</code> <code>/optimize</code> <code>/review</code> <code>/comment</code> <code>/convert</code> <code>/security</code></p>
+      <p class="hint">Dica: selecione um código e aperte <code>Cmd/Ctrl+L</code> para perguntar sobre ele.</p>
     </div>
   </main>
   <footer class="composer">
@@ -141,7 +151,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       <option value="cloud">Cloud</option>
       <option value="local">Local</option>
     </select>
-    <textarea id="input" rows="1" placeholder="Pergunte ao PedroIA… (Enter para enviar, Shift+Enter para nova linha)"></textarea>
+    <textarea id="input" rows="1" placeholder="Pergunte ao Clean Code… (Enter envia, Shift+Enter nova linha)"></textarea>
     <button id="send" title="Enviar">➤</button>
   </footer>
   <script nonce="${nonce}" src="${scriptUri}"></script>

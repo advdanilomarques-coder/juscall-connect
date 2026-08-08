@@ -25,13 +25,13 @@ export function activate(context: vscode.ExtensionContext): void {
   registerCommands(context, chatProvider);
 
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  status.text = "$(sparkle) PedroIA";
-  status.tooltip = "Abrir o chat do PedroIA";
-  status.command = "pedroia.openChat";
+  status.text = "$(sparkle) Clean Code";
+  status.tooltip = "Abrir o chat do Clean Code";
+  status.command = "cleancode.openChat";
   status.show();
   context.subscriptions.push(status);
 
-  console.log("PedroIA ativado.");
+  console.log("Clean Code ativado.");
 }
 
 export function deactivate(): void {

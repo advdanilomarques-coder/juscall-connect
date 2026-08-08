@@ -2,6 +2,7 @@
 .vscode-test/**
 src/**
 media/make_icon.py
+media/make_banner.py
 media/icon@256.png
 PUBLICAR.md
 .gitignore

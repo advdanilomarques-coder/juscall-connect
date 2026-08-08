@@ -3,6 +3,19 @@
 Todas as mudanças relevantes desta extensão são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [0.2.0] — 2026-08-08
+
+### Adicionado
+- **Renomeada para "Clean Code"** (marca, comandos e configurações `cleancode.*`).
+- **Perguntar sobre a seleção** (`Cmd/Ctrl+L`): abre o chat com o código já anexado (estilo Blackbox).
+- **Ajuda no terminal** (`Cmd/Ctrl+Alt+T` ou menu de contexto do terminal): lê a seleção e sugere o comando certo.
+- Novos comandos: `/document`, `/comment`, `/optimize`, `/review`, `/convert`, `/terminal`, `/commit`.
+- Banner e README profissional para o Marketplace.
+
+### Alterado
+- Respostas mais curtas, naturais e com emojis.
+- `backendUrl` já vem apontando para o servidor hospedado por padrão.
+
 ## [0.1.0] — 2026-08-02
 
 ### Adicionado

@@ -1,8 +1,8 @@
 {
-  "name": "pedroia",
-  "displayName": "PedroIA — AI Software Engineer",
-  "description": "PedroIA — Seu engenheiro de inteligência artificial dentro do VS Code. Chat, autocomplete e comandos para criar, corrigir e refatorar código.",
-  "version": "0.1.0",
+  "name": "clean-code",
+  "displayName": "Clean Code",
+  "description": "Assistente de IA para programação no VS Code: chat com contexto, autocomplete inline, ajuda no terminal e comandos para criar, corrigir, refatorar, documentar e revisar código — em qualquer linguagem.",
+  "version": "0.2.0",
   "publisher": "pedroia",
   "license": "MIT",
   "engines": {
@@ -12,6 +12,7 @@
     "Machine Learning",
     "Programming Languages",
     "Snippets",
+    "Formatters",
     "Other"
   ],
   "keywords": [
@@ -20,7 +21,10 @@
     "autocomplete",
     "chat",
     "llm",
-    "assistant"
+    "assistant",
+    "clean code",
+    "refactor",
+    "code review"
   ],
   "icon": "media/icon.png",
   "pricing": "Free",
@@ -48,114 +52,97 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "pedroia-sidebar",
-          "title": "PedroIA",
+          "id": "cleancode-sidebar",
+          "title": "Clean Code",
           "icon": "media/sidebar-icon.svg"
         }
       ]
     },
     "views": {
-      "pedroia-sidebar": [
+      "cleancode-sidebar": [
         {
           "type": "webview",
-          "id": "pedroia.chatView",
+          "id": "cleancode.chatView",
           "name": "Chat"
         }
       ]
     },
     "commands": [
-      {
-        "command": "pedroia.openChat",
-        "title": "PedroIA: Abrir Chat",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.create",
-        "title": "PedroIA: Criar projeto / código (/create)",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.explain",
-        "title": "PedroIA: Explicar código (/explain)",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.fix",
-        "title": "PedroIA: Corrigir erro (/fix)",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.refactor",
-        "title": "PedroIA: Melhorar código (/refactor)",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.test",
-        "title": "PedroIA: Criar testes (/test)",
-        "category": "PedroIA"
-      },
-      {
-        "command": "pedroia.security",
-        "title": "PedroIA: Analisar segurança (/security)",
-        "category": "PedroIA"
-      }
+      { "command": "cleancode.openChat", "title": "Abrir Chat", "category": "Clean Code" },
+      { "command": "cleancode.askSelection", "title": "Perguntar sobre a seleção", "category": "Clean Code" },
+      { "command": "cleancode.create", "title": "Criar projeto / código (/create)", "category": "Clean Code" },
+      { "command": "cleancode.explain", "title": "Explicar código (/explain)", "category": "Clean Code" },
+      { "command": "cleancode.fix", "title": "Corrigir erro (/fix)", "category": "Clean Code" },
+      { "command": "cleancode.refactor", "title": "Refatorar (/refactor)", "category": "Clean Code" },
+      { "command": "cleancode.test", "title": "Gerar testes (/test)", "category": "Clean Code" },
+      { "command": "cleancode.security", "title": "Análise de segurança (/security)", "category": "Clean Code" },
+      { "command": "cleancode.document", "title": "Documentar código (/document)", "category": "Clean Code" },
+      { "command": "cleancode.optimize", "title": "Otimizar desempenho (/optimize)", "category": "Clean Code" },
+      { "command": "cleancode.review", "title": "Revisão de código (/review)", "category": "Clean Code" },
+      { "command": "cleancode.comment", "title": "Comentar o código (/comment)", "category": "Clean Code" },
+      { "command": "cleancode.convert", "title": "Converter para outra linguagem (/convert)", "category": "Clean Code" },
+      { "command": "cleancode.terminalHelp", "title": "Ajuda com o Terminal", "category": "Clean Code" }
+    ],
+    "submenus": [
+      { "id": "cleancode.submenu", "label": "Clean Code" }
     ],
     "menus": {
       "editor/context": [
-        {
-          "submenu": "pedroia.submenu",
-          "group": "navigation@9"
-        }
+        { "submenu": "cleancode.submenu", "group": "navigation@9" }
       ],
-      "pedroia.submenu": [
-        { "command": "pedroia.explain", "group": "1_ai@1" },
-        { "command": "pedroia.fix", "group": "1_ai@2" },
-        { "command": "pedroia.refactor", "group": "1_ai@3" },
-        { "command": "pedroia.test", "group": "1_ai@4" },
-        { "command": "pedroia.security", "group": "1_ai@5" }
+      "cleancode.submenu": [
+        { "command": "cleancode.askSelection", "group": "1_ask@1" },
+        { "command": "cleancode.explain", "group": "2_ai@1" },
+        { "command": "cleancode.fix", "group": "2_ai@2" },
+        { "command": "cleancode.refactor", "group": "2_ai@3" },
+        { "command": "cleancode.document", "group": "2_ai@4" },
+        { "command": "cleancode.comment", "group": "2_ai@5" },
+        { "command": "cleancode.optimize", "group": "3_adv@1" },
+        { "command": "cleancode.review", "group": "3_adv@2" },
+        { "command": "cleancode.test", "group": "3_adv@3" },
+        { "command": "cleancode.security", "group": "3_adv@4" },
+        { "command": "cleancode.convert", "group": "3_adv@5" }
+      ],
+      "terminal/context": [
+        { "command": "cleancode.terminalHelp", "group": "navigation@1" }
+      ],
+      "commandPalette": [
+        { "command": "cleancode.terminalHelp", "when": "false" }
       ]
     },
-    "submenus": [
-      {
-        "id": "pedroia.submenu",
-        "label": "PedroIA"
-      }
-    ],
     "keybindings": [
-      {
-        "command": "pedroia.openChat",
-        "key": "ctrl+shift+i",
-        "mac": "cmd+shift+i"
-      }
+      { "command": "cleancode.openChat", "key": "ctrl+shift+i", "mac": "cmd+shift+i" },
+      { "command": "cleancode.askSelection", "key": "ctrl+l", "mac": "cmd+l", "when": "editorTextFocus" },
+      { "command": "cleancode.terminalHelp", "key": "ctrl+alt+t", "mac": "cmd+alt+t", "when": "terminalFocus" }
     ],
     "configuration": {
-      "title": "PedroIA",
+      "title": "Clean Code",
       "properties": {
-        "pedroia.backendUrl": {
+        "cleancode.backendUrl": {
           "type": "string",
-          "default": "http://127.0.0.1:8000",
-          "description": "URL do backend do PedroIA. Em produção, aponte para o seu servidor hospedado (ex.: https://pedroia-backend.onrender.com)."
+          "default": "https://pedroia-backend.onrender.com",
+          "description": "URL do servidor Clean Code (backend de IA)."
         },
-        "pedroia.apiKey": {
+        "cleancode.apiKey": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Chave de acesso ao backend hospedado do PedroIA. Obrigatória quando o servidor exige autenticação. Peça a sua chave ao administrador."
+          "markdownDescription": "Chave de acesso ao servidor Clean Code. Obrigatória quando o servidor exige autenticação."
         },
-        "pedroia.completion.enabled": {
+        "cleancode.completion.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Habilitar o autocomplete inline (PedroIA Code Completion Engine)."
+          "description": "Habilitar o autocomplete inline (sugestões em texto cinza, estilo Copilot)."
         },
-        "pedroia.completion.debounceMs": {
+        "cleancode.completion.debounceMs": {
           "type": "number",
           "default": 350,
           "description": "Tempo de espera (ms) antes de solicitar uma sugestão de autocomplete."
         },
-        "pedroia.preferredMode": {
+        "cleancode.preferredMode": {
           "type": "string",
           "enum": ["auto", "cloud", "local"],
           "default": "auto",
-          "description": "Estratégia de seleção de modelo: auto (online→cloud / offline→local), cloud (sempre nuvem) ou local (sempre Ollama)."
+          "description": "Estratégia de modelo: auto (nuvem quando online, local quando offline), cloud ou local."
         }
       }
     }

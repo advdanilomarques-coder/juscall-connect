@@ -93,6 +93,13 @@
       case "userEcho":
         addMessage("user", msg.text);
         break;
+      case "prefill":
+        inputEl.value = msg.text;
+        inputEl.style.height = "auto";
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + "px";
+        inputEl.focus();
+        inputEl.scrollTop = inputEl.scrollHeight;
+        break;
       case "thinking":
         showThinking();
         break;
