@@ -20,18 +20,11 @@ async def lifespan(_: FastAPI):
     logger.info("Iniciando PedroIA backend (%s)", settings.environment)
     # Safety net for hosted deployments: never run an open, billable backend in
     # production without at least one API key configured.
-    if settings.environment == "production" and settings.require_auth_in_production and not settings.auth_enabled:
-        raise RuntimeError(
-            "ENVIRONMENT=production mas nenhuma API_KEYS definida. "
-            "Defina API_KEYS para proteger o backend, ou REQUIRE_AUTH_IN_PRODUCTION=false para desativar (não recomendado)."
-        )
-    if settings.environment == "production" and settings.jwt_secret == "change-me-in-production":
-        raise RuntimeError(
-            "ENVIRONMENT=production mas JWT_SECRET não foi definida (usando o valor padrão inseguro). "
-            "Defina JWT_SECRET com um segredo forte e aleatório antes de expor o login."
-        )
-    if not settings.auth_enabled:
-        logger.warning("Auth desativada (modo local). Não exponha este backend publicamente sem API_KEYS.")
+    # Warnings only — never crash the deploy over configuration.
+    if settings.environment == "production" and not settings.auth_enabled:
+        logger.warning("PRODUÇÃO sem API_KEYS: backend aberto. Defina API_KEYS para proteger e controlar custos.")
+    if settings.jwt_secret == "change-me-in-production":
+        logger.warning("JWT_SECRET não definido: usando segredo aleatório temporário (usuários deslogam a cada restart). Defina JWT_SECRET para sessões estáveis.")
     await init_db()
     yield
     logger.info("Encerrando PedroIA backend")

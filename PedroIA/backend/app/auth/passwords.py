@@ -36,11 +36,11 @@ def create_access_token(subject: str) -> str:
         "exp": now + dt.timedelta(minutes=settings.jwt_expire_minutes),
         "type": "access",
     }
-    return jwt.encode(payload, settings.jwt_secret, algorithm=_ALGO)
+    return jwt.encode(payload, settings.resolved_jwt_secret, algorithm=_ALGO)
 
 
 def decode_token(token: str) -> dict | None:
     try:
-        return jwt.decode(token, get_settings().jwt_secret, algorithms=[_ALGO])
+        return jwt.decode(token, get_settings().resolved_jwt_secret, algorithms=[_ALGO])
     except jwt.PyJWTError:
         return None

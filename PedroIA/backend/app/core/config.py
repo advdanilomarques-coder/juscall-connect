@@ -1,9 +1,16 @@
 """Application configuration via Pydantic settings (12-factor / .env)."""
+import secrets
 from functools import lru_cache
 from typing import List
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_DEFAULT_JWT = "change-me-in-production"
+# Random per-process secret used when JWT_SECRET is not set. Keeps tokens secure
+# (never the public default) without ever crashing the app. Sessions reset on
+# restart until a stable JWT_SECRET is configured.
+_RUNTIME_JWT = secrets.token_urlsafe(48)
 
 
 class Settings(BaseSettings):
@@ -24,7 +31,7 @@ class Settings(BaseSettings):
     require_auth_in_production: bool = True
 
     # --- User accounts / JWT (for the website login) ---
-    jwt_secret: str = "change-me-in-production"
+    jwt_secret: str = _DEFAULT_JWT
     jwt_expire_minutes: int = 10080  # 7 days
     allow_signup: bool = True
 
@@ -65,6 +72,11 @@ class Settings(BaseSettings):
     @property
     def auth_enabled(self) -> bool:
         return len(self.allowed_api_keys) > 0
+
+    @property
+    def resolved_jwt_secret(self) -> str:
+        """Never the public default: fall back to a random per-process secret."""
+        return self.jwt_secret if self.jwt_secret and self.jwt_secret != _DEFAULT_JWT else _RUNTIME_JWT
 
 
 @lru_cache
