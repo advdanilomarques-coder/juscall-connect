@@ -1,8 +1,8 @@
 {
   "name": "clean-code",
   "displayName": "Clean Code",
-  "description": "Assistente de IA para programação no VS Code: chat com contexto, autocomplete inline, ajuda no terminal e comandos para criar, corrigir, refatorar, documentar e revisar código — em qualquer linguagem.",
-  "version": "0.2.0",
+  "description": "Assistente de IA para o VS Code: chat com contexto, autocomplete inline, ajuda no terminal e comandos para criar, corrigir, refatorar e revisar código em qualquer linguagem — e também responde dúvidas e conhecimentos gerais.",
+  "version": "0.3.0",
   "publisher": "pedroia",
   "license": "MIT",
   "engines": {
@@ -69,6 +69,7 @@
     },
     "commands": [
       { "command": "cleancode.openChat", "title": "Abrir Chat", "category": "Clean Code" },
+      { "command": "cleancode.openChatFullscreen", "title": "Abrir Chat em Tela Cheia", "category": "Clean Code", "icon": "$(screen-full)" },
       { "command": "cleancode.askSelection", "title": "Perguntar sobre a seleção", "category": "Clean Code" },
       { "command": "cleancode.create", "title": "Criar projeto / código (/create)", "category": "Clean Code" },
       { "command": "cleancode.explain", "title": "Explicar código (/explain)", "category": "Clean Code" },
@@ -106,8 +107,8 @@
       "terminal/context": [
         { "command": "cleancode.terminalHelp", "group": "navigation@1" }
       ],
-      "commandPalette": [
-        { "command": "cleancode.terminalHelp", "when": "false" }
+      "view/title": [
+        { "command": "cleancode.openChatFullscreen", "when": "view == cleancode.chatView", "group": "navigation@1" }
       ]
     },
     "keybindings": [
@@ -135,8 +136,8 @@
         },
         "cleancode.completion.debounceMs": {
           "type": "number",
-          "default": 350,
-          "description": "Tempo de espera (ms) antes de solicitar uma sugestão de autocomplete."
+          "default": 600,
+          "description": "Tempo de espera (ms) antes de solicitar uma sugestão de autocomplete. Maior = sugestões mais calmas."
         },
         "cleancode.preferredMode": {
           "type": "string",

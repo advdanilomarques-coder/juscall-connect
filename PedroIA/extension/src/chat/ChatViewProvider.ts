@@ -16,6 +16,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "cleancode.chatView";
 
   private view?: vscode.WebviewView;
+  private panel?: vscode.WebviewPanel;
   private history: ChatMessage[] = [];
   private readonly sessionId = `vscode-${Date.now()}`;
 
@@ -31,8 +32,29 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, "media")],
     };
     webviewView.webview.html = this.getHtml(webviewView.webview);
+    this.wire(webviewView.webview);
+  }
 
-    webviewView.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
+  /** Opens the chat as a full editor tab (full screen). Shares history + logic. */
+  public openInPanel(): void {
+    if (this.panel) {
+      this.panel.reveal(vscode.ViewColumn.Active);
+      return;
+    }
+    this.panel = vscode.window.createWebviewPanel(
+      "cleancode.chatPanel",
+      "Clean Code — Chat",
+      vscode.ViewColumn.Active,
+      { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, "media")] }
+    );
+    this.panel.webview.html = this.getHtml(this.panel.webview);
+    this.wire(this.panel.webview);
+    this.panel.onDidDispose(() => (this.panel = undefined));
+  }
+
+  /** Wires a webview's message handling (used by both the sidebar and the panel). */
+  private wire(webview: vscode.Webview): void {
+    webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
       switch (msg.type) {
         case "sendMessage":
           await this.handleUserMessage(msg.text || "", msg.mode || "auto");
@@ -61,6 +83,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async reveal(): Promise<void> {
+    // If a full-screen panel is open, use it; otherwise reveal the sidebar view.
+    if (this.panel) {
+      this.panel.reveal(vscode.ViewColumn.Active);
+      return;
+    }
     if (!this.view) {
       await vscode.commands.executeCommand("cleancode.chatView.focus");
       await new Promise((r) => setTimeout(r, 350));
@@ -105,14 +132,16 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   private async checkBackend(): Promise<void> {
     try {
       const h = await this.client.health();
-      this.post({ type: "status", text: h.online ? "Online (cloud disponível)" : "Offline (modo local)", ok: true });
+      this.post({ type: "status", text: h.online ? "Online (nuvem disponível)" : "Offline (modo local)", ok: true });
     } catch {
-      this.post({ type: "status", text: "Backend não encontrado — inicie o servidor PedroIA", ok: false });
+      this.post({ type: "status", text: "Servidor Clean Code não encontrado — verifique a Backend Url nas configurações", ok: false });
     }
   }
 
+  /** Posts to every open surface (sidebar view and/or full-screen panel). */
   private post(message: unknown): void {
     this.view?.webview.postMessage(message);
+    this.panel?.webview.postMessage(message);
   }
 
   private getHtml(webview: vscode.Webview): string {

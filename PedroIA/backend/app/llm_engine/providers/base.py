@@ -32,18 +32,24 @@ class LLMProvider(ABC):
     async def chat(self, messages: List[Message], max_tokens: int = 1024) -> LLMResult:
         ...
 
-    async def complete(self, prefix: str, suffix: str, language: str, max_tokens: int = 128) -> str:
-        """Fill-in-the-middle style code completion. Default = derive from chat."""
+    async def complete(self, prefix: str, suffix: str, language: str, max_tokens: int = 96) -> str:
+        """Fill-in-the-middle style code completion. Default = derive from chat.
+
+        Kept deliberately terse so suggestions feel calm (Copilot-like)."""
+        system = (
+            "Você é um motor de autocomplete de código, como o GitHub Copilot. "
+            "Regras: responda SOMENTE com o texto que vem imediatamente após o cursor; "
+            "NÃO repita o que já foi escrito; NÃO explique; NÃO use blocos de código com crases; "
+            "seja curto — normalmente 1 linha, no máximo poucas linhas, só o suficiente para "
+            "completar a linha ou o bloco atual de forma natural."
+        )
         prompt = (
-            f"Complete o código {language} a seguir. Responda APENAS com o código que vem "
-            f"logo após o cursor, sem explicações e sem repetir o que já existe.\n\n"
-            f"<antes>\n{prefix}\n</antes>\n<depois>\n{suffix}\n</depois>"
+            f"Linguagem: {language}\n"
+            f"Complete a continuação no ponto <CURSOR>.\n\n"
+            f"{prefix}<CURSOR>{suffix}"
         )
         result = await self.chat(
-            [
-                Message("system", "Você é um motor de autocomplete de código. Responda só com código."),
-                Message("user", prompt),
-            ],
+            [Message("system", system), Message("user", prompt)],
             max_tokens=max_tokens,
         )
         return _strip_code_fence(result.content)

@@ -14,8 +14,8 @@ bcrypt==4.2.1
 # --- Database ---
 sqlalchemy[asyncio]==2.0.36
 aiosqlite==0.20.0
-# PostgreSQL (production) — uncomment to use:
-# asyncpg==0.30.0
+# PostgreSQL (production / persistent accounts — Neon, Supabase, Render)
+asyncpg==0.30.0
 
 # --- Cache / queues (optional) ---
 redis==5.2.1

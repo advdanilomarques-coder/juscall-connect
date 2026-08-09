@@ -15,15 +15,12 @@ class FallbackProvider(LLMProvider):
         return True
 
     async def chat(self, messages: List[Message], max_tokens: int = 1024) -> LLMResult:
-        last_user = next((m.content for m in reversed(messages) if m.role == "user"), "")
         msg = (
-            "⚙️ **PedroIA está em modo de configuração.**\n\n"
-            "Nenhum modelo de IA está ativo ainda. Para habilitar respostas reais, escolha uma opção:\n\n"
-            "**Nuvem** — defina uma chave no `backend/.env`:\n"
-            "```\nANTHROPIC_API_KEY=...\n# ou OPENAI_API_KEY / GEMINI_API_KEY / DEEPSEEK_API_KEY\n```\n\n"
-            "**Local (offline)** — instale o Ollama e baixe um modelo:\n"
-            "```\nollama pull llama3.1\n```\n\n"
-            f"Sua mensagem foi recebida: _{last_user[:200]}_"
+            "⚙️ **Clean Code está sem um modelo de IA ativo.**\n\n"
+            "O servidor está no ar, mas nenhuma chave de modelo foi encontrada. "
+            "Defina **uma** destas variáveis no servidor (Render → Environment) e faça o deploy:\n\n"
+            "`GROQ_API_KEY` (grátis, recomendado) · `ANTHROPIC_API_KEY` · `OPENAI_API_KEY` · `GEMINI_API_KEY`\n\n"
+            "Depois teste em `/api/v1/diag` para confirmar que o provedor respondeu."
         )
         return LLMResult(content=msg, model="none", provider=self.name)
 

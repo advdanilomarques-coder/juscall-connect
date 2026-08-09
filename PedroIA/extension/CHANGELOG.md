@@ -3,6 +3,22 @@
 Todas as mudanças relevantes desta extensão são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [0.3.0] — 2026-08-09
+
+### Adicionado
+- **Chat em tela cheia**: botão no topo do painel e comando "Abrir Chat em Tela Cheia".
+- Conhecimentos gerais (não só código) na descrição e no comportamento.
+
+### Alterado
+- **Autocomplete recalibrado** (estilo Copilot): mais calmo, contexto-aware, 1 linha por
+  padrão e multilinha só quando o bloco abre; saída limpa (sem crases/eco/lixo).
+- Suporte a **muitos caracteres** (limites ampliados) com aviso claro quando excede.
+
+### Corrigido
+- **Ajuda no terminal** agora funciona: lê a seleção com timing correto e, se não houver
+  seleção, pede o texto por um campo.
+- Mensagens e status renomeados de "PedroIA" para "Clean Code".
+
 ## [0.2.0] — 2026-08-08
 
 ### Adicionado

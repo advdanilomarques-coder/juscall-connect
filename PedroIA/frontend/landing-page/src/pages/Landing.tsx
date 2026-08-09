@@ -5,12 +5,19 @@ import { useAuth } from "../auth";
 import { VSCODE_MARKETPLACE_URL, GITHUB_URL } from "../config";
 
 const FEATURES = [
-  { icon: "💬", title: "Chat com contexto", desc: "Converse e resolva dúvidas — de código a assuntos gerais — com memória da conversa." },
-  { icon: "⚡", title: "Autocomplete inline", desc: "Sugestões em tempo real enquanto você digita, no estilo dos melhores assistentes." },
+  { icon: "⚡", title: "Autocomplete inline", desc: "Sugestões calmas em tempo real enquanto você digita, no estilo Copilot. É o coração do Clean Code." },
+  { icon: "💬", title: "Chat com contexto", desc: "Converse e resolva dúvidas com memória da conversa, direto no editor." },
   { icon: "🧠", title: "Entende seu projeto", desc: "Lê o arquivo, a seleção e os erros automaticamente. Sem prompts gigantes." },
   { icon: "🛠️", title: "13+ comandos", desc: "Explicar, corrigir, refatorar, documentar, revisar, otimizar, testar, converter e mais." },
   { icon: "💻", title: "Ajuda no terminal", desc: "Leia um erro do terminal e receba o comando exato para resolver." },
-  { icon: "🔌", title: "Multi-modelo", desc: "Nuvem (Claude, GPT, Gemini, Groq) e modelos locais. Online ou offline." },
+  { icon: "🌐", title: "Conhecimentos gerais", desc: "Além de código, tira dúvidas do dia a dia, explica conceitos e ajuda a escrever." },
+];
+
+const FAQ = [
+  { q: "O Clean Code é só para código?", a: "Não. O foco central é programação — autocomplete, chat e comandos —, mas ele também responde conhecimentos gerais e dúvidas do dia a dia." },
+  { q: "Funciona em quais linguagens?", a: "Em praticamente todas: Python, JavaScript, TypeScript, Java, C, C++, C#, Go, Rust, PHP, Kotlin, Swift, SQL e mais." },
+  { q: "Preciso pagar?", a: "É grátis para começar. Você pode usar modelos gratuitos na nuvem ou rodar modelos locais." },
+  { q: "Meus dados ficam seguros?", a: "O código enviado é processado pelo servidor e pelo modelo de IA configurado. Evite enviar segredos e use um serviço de sua confiança." },
 ];
 
 const STEPS = [
@@ -70,7 +77,7 @@ export default function Landing() {
             </p>
             <div className="cta">
               <a className="btn-primary" href={VSCODE_MARKETPLACE_URL} target="_blank" rel="noreferrer">
-                ⬇ Instalar no VS Code
+                Abrir no VS Code →
               </a>
               <Link className="btn-ghost" to={session ? "/app" : "/signup"}>
                 {session ? "Abrir o chat" : "Testar pelo site"}
@@ -134,9 +141,25 @@ export default function Landing() {
               assistente lembrar do contexto ao longo do tempo.
             </p>
             <div className="about-actions">
-              <a className="btn-primary" href={VSCODE_MARKETPLACE_URL} target="_blank" rel="noreferrer">Instalar extensão</a>
+              <a className="btn-primary" href={VSCODE_MARKETPLACE_URL} target="_blank" rel="noreferrer">Abrir no VS Code</a>
               <a className="btn-ghost" href={GITHUB_URL} target="_blank" rel="noreferrer">Ver no GitHub</a>
             </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="section muted">
+          <div className="section-head" data-reveal>
+            <span className="kicker">Perguntas frequentes</span>
+            <h2>Ainda com dúvida?</h2>
+          </div>
+          <div className="faq">
+            {FAQ.map((item, i) => (
+              <details className="faq-item" data-reveal style={{ transitionDelay: `${i * 60}ms` }} key={item.q}>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
           </div>
         </section>
 
@@ -144,9 +167,9 @@ export default function Landing() {
         <section className="section cta-band">
           <div className="cta-inner" data-reveal>
             <h2>Pronto para programar com o Clean Code?</h2>
-            <p>Grátis para começar. Instale a extensão ou experimente pelo site.</p>
+            <p>Grátis para começar. Abra no VS Code ou experimente pelo site.</p>
             <div className="cta">
-              <a className="btn-primary" href={VSCODE_MARKETPLACE_URL} target="_blank" rel="noreferrer">⬇ Instalar no VS Code</a>
+              <a className="btn-primary" href={VSCODE_MARKETPLACE_URL} target="_blank" rel="noreferrer">Abrir no VS Code →</a>
               <Link className="btn-ghost" to={session ? "/app" : "/signup"}>Testar pelo site</Link>
             </div>
           </div>

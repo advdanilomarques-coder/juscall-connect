@@ -25,6 +25,11 @@ async def lifespan(_: FastAPI):
             "ENVIRONMENT=production mas nenhuma API_KEYS definida. "
             "Defina API_KEYS para proteger o backend, ou REQUIRE_AUTH_IN_PRODUCTION=false para desativar (não recomendado)."
         )
+    if settings.environment == "production" and settings.jwt_secret == "change-me-in-production":
+        raise RuntimeError(
+            "ENVIRONMENT=production mas JWT_SECRET não foi definida (usando o valor padrão inseguro). "
+            "Defina JWT_SECRET com um segredo forte e aleatório antes de expor o login."
+        )
     if not settings.auth_enabled:
         logger.warning("Auth desativada (modo local). Não exponha este backend publicamente sem API_KEYS.")
     await init_db()

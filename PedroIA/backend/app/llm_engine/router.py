@@ -70,23 +70,30 @@ class ModelRouter:
 
     # --- selection ---
     def select(self, mode: str = "auto") -> LLMProvider:
+        """Choose a provider. Robustness rule: NEVER return the fallback while any
+        real provider (cloud key or local Ollama) is usable — even in 'local' mode
+        we prefer a working cloud model over a dead-end configuration message."""
         mode = (mode or "auto").lower()
+        cloud = self.available_cloud()
+
         if mode == "local":
-            return self._ollama if self._ollama.is_available() else self._fallback
+            if self._ollama.is_available():
+                return self._ollama
+            return cloud[0] if cloud else self._fallback
+
         if mode == "cloud":
-            cloud = self.available_cloud()
             if cloud:
                 return cloud[0]
             return self._ollama if self._ollama.is_available() else self._fallback
-        # auto
-        if internet_available():
-            cloud = self.available_cloud()
-            if cloud:
-                return cloud[0]
+
+        # auto: prefer cloud when reachable, then local, then any configured cloud.
+        if cloud and internet_available():
+            return cloud[0]
         if self._ollama.is_available():
             return self._ollama
-        cloud = self.available_cloud()  # maybe connectivity check failed but keys work
-        return cloud[0] if cloud else self._fallback
+        if cloud:  # connectivity probe failed but keys exist — try anyway
+            return cloud[0]
+        return self._fallback
 
     # --- operations ---
     async def chat(self, messages: List[Message], mode: str = "auto", max_tokens: int = 1024) -> LLMResult:

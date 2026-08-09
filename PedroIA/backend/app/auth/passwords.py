@@ -11,13 +11,18 @@ from app.core.config import get_settings
 _ALGO = "HS256"
 
 
+def _pw_bytes(plain: str) -> bytes:
+    # bcrypt only uses the first 72 bytes; truncate explicitly to avoid errors.
+    return plain.encode("utf-8")[:72]
+
+
 def hash_password(plain: str) -> str:
-    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    return bcrypt.hashpw(_pw_bytes(plain), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     try:
-        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+        return bcrypt.checkpw(_pw_bytes(plain), hashed.encode("utf-8"))
     except (ValueError, TypeError):
         return False
 

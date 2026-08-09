@@ -12,6 +12,7 @@ export function registerCommands(context: vscode.ExtensionContext, chat: ChatVie
 
   context.subscriptions.push(
     vscode.commands.registerCommand("cleancode.openChat", focusChat),
+    vscode.commands.registerCommand("cleancode.openChatFullscreen", () => chat.openInPanel()),
 
     // Blackbox-style: open the chat with the current code attached, ready for your question.
     vscode.commands.registerCommand("cleancode.askSelection", async () => {
@@ -53,20 +54,33 @@ export function registerCommands(context: vscode.ExtensionContext, chat: ChatVie
 
     // Reads the current terminal selection and asks for help (explain/fix).
     vscode.commands.registerCommand("cleancode.terminalHelp", async () => {
-      const before = await vscode.env.clipboard.readText();
-      await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
-      const selection = (await vscode.env.clipboard.readText()).trim();
-      // Restore the user's clipboard.
-      await vscode.env.clipboard.writeText(before);
-
-      if (!selection) {
-        vscode.window.showInformationMessage(
-          "Selecione o texto no terminal (o comando ou o erro) e rode 'Clean Code: Ajuda com o Terminal' novamente."
-        );
+      const term = vscode.window.activeTerminal;
+      if (!term) {
+        vscode.window.showInformationMessage("Abra um terminal e selecione o texto (comando ou erro) primeiro.");
         return;
       }
-      const prompt = `/terminal Explique o que está acontecendo neste terminal e, se houver erro, diga o comando exato para resolver.\n\n\`\`\`\n${selection}\n\`\`\``;
-      await chat.ask(prompt);
+      const before = await vscode.env.clipboard.readText();
+      await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
+      // Give the clipboard a moment to update before reading it back.
+      await new Promise((r) => setTimeout(r, 150));
+      const selection = (await vscode.env.clipboard.readText()).trim();
+      // Restore the user's previous clipboard content.
+      if (before !== selection) {
+        await vscode.env.clipboard.writeText(before);
+      }
+
+      if (!selection || selection === before) {
+        const typed = await vscode.window.showInputBox({
+          prompt: "Cole o comando ou erro do terminal para o Clean Code ajudar",
+          placeHolder: "Ex.: npm ERR! code ELIFECYCLE …",
+        });
+        if (!typed) {
+          return;
+        }
+        await chat.ask(terminalPrompt(typed));
+        return;
+      }
+      await chat.ask(terminalPrompt(selection));
     }),
 
     vscode.commands.registerCommand("cleancode.explain", () => runOnSelection(chat, "/explain", "Explique este código de forma objetiva")),
@@ -79,6 +93,10 @@ export function registerCommands(context: vscode.ExtensionContext, chat: ChatVie
     vscode.commands.registerCommand("cleancode.review", () => runOnSelection(chat, "/review", "Faça uma revisão de código (code review) apontando problemas e melhorias")),
     vscode.commands.registerCommand("cleancode.comment", () => runOnSelection(chat, "/comment", "Adicione comentários claros explicando este código"))
   );
+}
+
+function terminalPrompt(content: string): string {
+  return `/terminal Explique o que está acontecendo neste terminal e, se houver erro, diga o comando exato para resolver.\n\n\`\`\`\n${content}\n\`\`\``;
 }
 
 async function runOnSelection(chat: ChatViewProvider, slash: string, instruction: string): Promise<void> {
