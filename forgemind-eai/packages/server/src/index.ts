@@ -232,6 +232,28 @@ app.post("/api/index", async (req) => {
   return indexProject(state.db, root);
 });
 
+// -------------------- Fallback amigavel --------------------
+// Se o site nao estiver compilado, "/" nao daria 404 cru: mostra instrucoes.
+const siteBuilt = existsSync(join(webDist, "index.html"));
+app.setNotFoundHandler((req, reply) => {
+  const wantsHtml = (req.headers.accept ?? "").includes("text/html");
+  if (wantsHtml && !siteBuilt) {
+    reply.type("text/html").send(`<!doctype html><meta charset="utf-8">
+<title>ForgeMind EAI</title>
+<body style="font-family:system-ui;background:#0f1115;color:#e6e6e6;display:grid;place-items:center;height:100vh;margin:0">
+<div style="max-width:520px;padding:2rem;border:1px solid #2a2f3a;border-radius:16px">
+<h1 style="color:#FF7A1A;margin:0 0 .5rem">ForgeMind EAI</h1>
+<p>O backend esta rodando, mas o <b>site ainda nao foi compilado</b>.</p>
+<p>Rode no terminal, dentro da pasta do projeto:</p>
+<pre style="background:#161a22;padding:1rem;border-radius:8px;overflow:auto">npm run build:web</pre>
+<p>Depois reinicie o servidor e recarregue esta pagina.</p>
+<p style="color:#8a94a6">API disponivel em <code>/api/health</code>, <code>/api/info</code>.</p>
+</div></body>`);
+    return;
+  }
+  reply.code(404).send({ message: `Rota ${req.method}:${req.url} nao encontrada`, statusCode: 404 });
+});
+
 // -------------------- Start --------------------
 const port = state.config.port;
 const host = state.config.host;
