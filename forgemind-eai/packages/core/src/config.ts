@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
 
-export const ProviderName = z.enum(["heuristic", "local-llama", "gemini"]);
+export const ProviderName = z.enum(["heuristic", "local-llama", "gemini", "hybrid"]);
 export type ProviderName = z.infer<typeof ProviderName>;
 
 export const InlineLevel = z.enum(["OFF", "LOW", "BALANCED", "HIGH"]);

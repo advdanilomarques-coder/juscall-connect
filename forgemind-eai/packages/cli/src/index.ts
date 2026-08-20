@@ -159,7 +159,7 @@ program
       console.log(brand.dim("  troque com: forgemind provider gemini\n"));
       return;
     }
-    const valid = ["heuristic", "local-llama", "gemini"];
+    const valid = ["heuristic", "local-llama", "gemini", "hybrid"];
     if (!valid.includes(name)) {
       console.log(brand.err(`  invalido: ${name}. Use: ${valid.join(" | ")}`));
       process.exit(1);
@@ -179,15 +179,17 @@ program
     mkdirSync(cfg.home, { recursive: true });
     const envPath = join(cfg.home, ".env");
     const kv: Record<string, string> = {
-      AI_PROVIDER: "gemini",
+      AI_PROVIDER: "hybrid", // chat = Gemini; inline = local (rapido e privado)
       GEMINI_API_KEY: apikey,
       GEMINI_MODEL: model ?? cfg.gemini.model ?? "gemini-1.5-flash",
     };
     writeEnv(envPath, kv);
-    saveConfig({ provider: "gemini", gemini: { model: kv.GEMINI_MODEL } as any });
-    console.log(brand.ok(`\n✔ Gemini ativado (modelo ${kv.GEMINI_MODEL}).`));
+    saveConfig({ provider: "hybrid", gemini: { model: kv.GEMINI_MODEL } as any });
+    console.log(brand.ok(`\n✔ Gemini ativado em modo HIBRIDO (modelo ${kv.GEMINI_MODEL}).`));
+    console.log(brand.dim("  chat = Gemini (nuvem)  •  inline = local/heuristico (rapido e privado)"));
     console.log(brand.dim(`  chave salva em ${envPath} (fora do git, nunca no config.json).`));
-    console.log(brand.dim("  funciona agora de qualquer diretorio: forgemind\n"));
+    console.log(brand.dim("  funciona agora de qualquer diretorio: forgemind"));
+    console.log(brand.dim("  (chat 100% Gemini: forgemind provider gemini)\n"));
   });
 
 /** Atualiza (ou insere) pares chave=valor num arquivo .env preservando o resto. */

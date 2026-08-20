@@ -2,12 +2,14 @@ import type { ForgeConfig } from "../config.js";
 import { HeuristicProvider } from "./heuristic.js";
 import { LocalLlamaProvider } from "./local-llama.js";
 import { GeminiProvider } from "./gemini.js";
+import { HybridProvider } from "./hybrid.js";
 import type { AIProvider } from "./types.js";
 
 export * from "./types.js";
 export { HeuristicProvider } from "./heuristic.js";
 export { LocalLlamaProvider } from "./local-llama.js";
 export { GeminiProvider } from "./gemini.js";
+export { HybridProvider } from "./hybrid.js";
 
 /**
  * Factory de provider (PDF item 4): o nome do modelo/fornecedor nao se espalha
@@ -16,6 +18,8 @@ export { GeminiProvider } from "./gemini.js";
  */
 export function createProvider(cfg: ForgeConfig): AIProvider {
   switch (cfg.provider) {
+    case "hybrid":
+      return new HybridProvider(cfg);
     case "gemini":
       return new GeminiProvider(cfg);
     case "local-llama":
