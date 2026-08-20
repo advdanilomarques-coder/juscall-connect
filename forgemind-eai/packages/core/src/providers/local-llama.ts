@@ -44,7 +44,10 @@ export class LocalLlamaProvider implements AIProvider {
   private async ensureModule(): Promise<any> {
     if (this.mod) return this.mod;
     try {
-      this.mod = await import("node-llama-cpp");
+      // Especificador com tipo `string` (nao literal) => TS nao resolve o modulo
+      // em tempo de compilacao. `node-llama-cpp` e dependencia OPCIONAL.
+      const spec: string = "node-llama-cpp";
+      this.mod = await import(spec);
       return this.mod;
     } catch {
       throw new ProviderUnavailableError(
