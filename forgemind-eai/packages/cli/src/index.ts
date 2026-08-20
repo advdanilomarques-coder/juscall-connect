@@ -182,7 +182,7 @@ program
     const kv: Record<string, string> = {
       AI_PROVIDER: "hybrid", // chat = Gemini; inline = local (rapido e privado)
       GEMINI_API_KEY: apikey,
-      GEMINI_MODEL: model ?? cfg.gemini.model ?? "gemini-1.5-flash",
+      GEMINI_MODEL: model ?? cfg.gemini.model ?? "gemini-flash-latest",
     };
     writeEnv(envPath, kv);
     syncProjectEnv({ AI_PROVIDER: "hybrid", GEMINI_MODEL: kv.GEMINI_MODEL! }); // mantem o projeto em sincronia

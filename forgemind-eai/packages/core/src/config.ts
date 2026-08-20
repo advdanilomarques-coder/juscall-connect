@@ -32,7 +32,7 @@ export const ConfigSchema = z.object({
   gemini: z
     .object({
       // A key NUNCA e persistida no config.json; vem so do ambiente.
-      model: z.string().default("gemini-1.5-flash"),
+      model: z.string().default("gemini-flash-latest"),
     })
     .default({}),
 });

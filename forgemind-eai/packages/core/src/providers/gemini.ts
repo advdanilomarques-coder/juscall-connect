@@ -24,7 +24,7 @@ export class GeminiProvider implements AIProvider {
   constructor(private readonly cfg: ForgeConfig) {}
 
   private endpoint(stream: boolean): string {
-    const model = this.cfg.gemini.model || "gemini-1.5-flash";
+    const model = this.cfg.gemini.model || "gemini-flash-latest";
     const method = stream ? "streamGenerateContent" : "generateContent";
     return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${method}`;
   }
