@@ -15,7 +15,8 @@
     "commands": [
       { "command": "forgemind.chat", "title": "ForgeMind: Abrir Chat" },
       { "command": "forgemind.explainSelection", "title": "ForgeMind: Explicar seleção" },
-      { "command": "forgemind.openSite", "title": "ForgeMind: Abrir meu site (localhost)" }
+      { "command": "forgemind.openSite", "title": "ForgeMind: Abrir meu site (localhost)" },
+      { "command": "forgemind.indexProject", "title": "ForgeMind: Indexar projeto" }
     ],
     "configuration": {
       "title": "ForgeMind EAI",

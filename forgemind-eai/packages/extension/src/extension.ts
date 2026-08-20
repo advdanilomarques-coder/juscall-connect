@@ -118,6 +118,32 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
   );
 
+  // -------- Comando: indexar projeto (contexto cruzado do inline) --------
+  const indexProject = async (silent = false) => {
+    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!root) return;
+    try {
+      const res = await fetch(`${serverUrl()}/api/index`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ root }),
+      });
+      const data = (await res.json()) as { files?: number; symbols?: number; error?: string };
+      if (!silent) {
+        vscode.window.showInformationMessage(
+          data.error ? `ForgeMind: ${data.error}` : `ForgeMind indexou ${data.files} arquivos, ${data.symbols} símbolos.`,
+        );
+      }
+    } catch {
+      if (!silent) vscode.window.showWarningMessage("ForgeMind: backend offline? Rode `forgemind start`.");
+    }
+  };
+  context.subscriptions.push(
+    vscode.commands.registerCommand("forgemind.indexProject", () => indexProject(false)),
+  );
+  // Auto-indexa ao abrir (silencioso) para que o inline tenha contexto do projeto.
+  void indexProject(true);
+
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   status.text = "$(flame) ForgeMind";
   status.tooltip = "ForgeMind EAI — chat";
