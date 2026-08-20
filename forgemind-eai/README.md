@@ -21,13 +21,14 @@ Terminal AI, health monitor e auto‑manutenção. Nada é hospedado; nada sai d
 | Provider | Internet | Modelo | Quando usar |
 |---|---|---|---|
 | `heuristic` *(padrão)* | ❌ não | nenhum | Instantâneo. Completar código, comandos e ajuda. Sempre funciona. |
-| `local-llama` | ❌ não* | GGUF local (ex.: Qwen2.5‑3B) | Conversa natural + assuntos gerais, offline e ilimitado. |
+| `local-llama` | ❌ não* | GGUF local (ex.: Qwen2.5‑Coder‑3B) | Código, **inline (FIM)** e conversa, offline e ilimitado. |
 | `gemini` | ✅ sim | Google Gemini | Qualidade máxima sob demanda. Opcional, desligado por padrão. |
 
 *\*`local-llama` precisa de internet **uma vez** para baixar o modelo; depois é 100% offline.*
 
-Recomendado para Mac Intel com ~10 GB de RAM: **`local-llama` com Qwen2.5‑3B (Q4)**.
-Não usa Ollama — usa `node-llama-cpp` (llama.cpp nativo em Node).
+Recomendado (foco em código/inline): **`local-llama` com Qwen2.5‑Coder‑3B (Q4)** — forte em
+código e com **FIM/infill** para o Ghost Text. Não usa Ollama — usa `node-llama-cpp`
+(llama.cpp nativo em Node).
 
 ## Instalação rápida
 
@@ -52,7 +53,7 @@ node packages/cli/dist/index.js        # abre o chat no terminal
 
 **Ativar o cérebro local (conversa natural offline):**
 ```bash
-./scripts/model-pull.sh                # baixa Qwen2.5-3B (uma vez)
+./scripts/model-pull.sh                # baixa Qwen2.5-Coder-3B (uma vez)
 npm install node-llama-cpp --workspace @forgemind/core
 # em /config do site, escolha o provider "local-llama"
 ```

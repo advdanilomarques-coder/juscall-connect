@@ -7,9 +7,9 @@ Estado atual: **fundação funcional (v0.1)**. O que já roda e o que vem a segu
 - [x] Monorepo TypeScript (core, server, cli, web, extension).
 - [x] Camada de provider plugável: `heuristic` (offline), `local-llama` (offline), `gemini` (online).
 - [x] SQLite local com migrations, memória, histórico, FTS (pesquisa).
-- [x] Índice de projeto incremental (arquivos + símbolos, agnóstico à linguagem).
-- [x] Context retriever (recupera só o relevante).
-- [x] Ghost Text heurístico (editor e terminal) com confidence gate.
+- [x] Índice de projeto incremental (arquivos + símbolos + **imports/dependências**, agnóstico à linguagem).
+- [x] **Context retriever cruzado** (arquivo atual + módulos importados + ranking por exports).
+- [x] Ghost Text com confidence gate + **inline via FIM do modelo local** (cache, timeout, fallback heurístico).
 - [x] Terminal AI: explicar/sugerir comandos, marcação de perigosos.
 - [x] CLI com REPL de chat estilo Claude Code + comando `localhost`.
 - [x] Site próprio (chat streaming, memória, `/config`, tema claro/escuro).
@@ -19,8 +19,9 @@ Estado atual: **fundação funcional (v0.1)**. O que já roda e o que vem a segu
 
 ## v0.2 — próximos passos sugeridos
 
-- [ ] Inline com LLM local para blocos maiores (hoje o inline é heurístico mesmo com modelo).
 - [ ] Índice semântico (embeddings locais) para recuperação por significado, não só por nome.
+- [ ] Grafo de dependências reverso (quem importa X) para impacto de mudança.
+- [ ] Agente de edição: propor patches (diff) a partir de uma tarefa, com aplicação revisável.
 - [ ] Métricas do inline (aceitação, latência, cache hit) na UI.
 - [ ] Auto‑maintenance ativa (watchdog que reinicia processos caídos).
 - [ ] Histórico de conversas navegável no site (sidebar com conversas salvas).

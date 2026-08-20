@@ -24,8 +24,10 @@ export interface CompletionRequest {
   suffix: string;
   language: string;
   path?: string;
-  /** Simbolos/contexto relevante do projeto. */
+  /** Simbolos/contexto relevante do projeto (contexto cruzado). */
   context?: string;
+  /** Nivel do inline: molda tamanho/multilinha da sugestao. */
+  level?: "OFF" | "LOW" | "BALANCED" | "HIGH";
   signal?: AbortSignal;
 }
 

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import type { DB } from "./db.js";
 import { isSensitiveFile } from "./redaction.js";
@@ -51,7 +51,11 @@ export function indexProject(db: DB, root: string, maxBytes = 400_000): IndexSta
   const getFile = db.prepare("SELECT id, hash FROM project_files WHERE project = ? AND path = ?");
   const clearSymbols = db.prepare("DELETE FROM project_symbols WHERE file_id = ?");
   const insSymbol = db.prepare(
-    "INSERT INTO project_symbols (file_id, name, kind, line, signature) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO project_symbols (file_id, name, kind, line, signature, exported) VALUES (?, ?, ?, ?, ?, ?)",
+  );
+  const clearImports = db.prepare("DELETE FROM project_imports WHERE file_id = ?");
+  const insImport = db.prepare(
+    "INSERT INTO project_imports (file_id, module, resolved_path, names) VALUES (?, ?, ?, ?)",
   );
 
   const tx = db.transaction(() => {
@@ -89,8 +93,13 @@ export function indexProject(db: DB, root: string, maxBytes = 400_000): IndexSta
       const row = getFile.get(project, rel) as { id: number };
       clearSymbols.run(row.id);
       for (const sym of extractSymbols(content, lang)) {
-        insSymbol.run(row.id, sym.name, sym.kind, sym.line, sym.signature ?? null);
+        insSymbol.run(row.id, sym.name, sym.kind, sym.line, sym.signature ?? null, sym.exported ? 1 : 0);
         stats.symbols++;
+      }
+      clearImports.run(row.id);
+      for (const imp of extractImports(content, lang)) {
+        const resolved = resolveModule(rel, imp.module, root);
+        insImport.run(row.id, imp.module, resolved, imp.names.join(","));
       }
       stats.files++;
     }
@@ -135,6 +144,7 @@ interface Symbol {
   kind: string;
   line: number;
   signature?: string;
+  exported?: boolean;
 }
 
 /** Extracao leve de simbolos por regex — agnostica, sem AST pesado. */
@@ -142,15 +152,75 @@ export function extractSymbols(content: string, lang: string): Symbol[] {
   const out: Symbol[] = [];
   const lines = content.split("\n");
   const rules = SYMBOL_RULES[lang] ?? SYMBOL_RULES.generic!;
+  const jsish = ["typescript", "typescriptreact", "javascript", "javascriptreact"].includes(lang);
   lines.forEach((line, i) => {
     for (const { re, kind } of rules) {
       const m = re.exec(line);
       if (m && m[1]) {
-        out.push({ name: m[1], kind, line: i + 1, signature: line.trim().slice(0, 200) });
+        const exported = jsish ? /\bexport\b/.test(line) : !/^\s/.test(line); // top-level = publico
+        out.push({ name: m[1], kind, line: i + 1, signature: line.trim().slice(0, 200), exported });
       }
     }
   });
   return out;
+}
+
+export interface ImportRef {
+  module: string;
+  names: string[];
+}
+
+/** Extrai imports/dependencias por linguagem (regex, leve). */
+export function extractImports(content: string, lang: string): ImportRef[] {
+  const out: ImportRef[] = [];
+  const push = (module: string, names: string[]) => {
+    if (module) out.push({ module, names });
+  };
+  if (["typescript", "typescriptreact", "javascript", "javascriptreact"].includes(lang)) {
+    const reFrom = /import\s+(?:type\s+)?(.+?)\s+from\s+["']([^"']+)["']/g;
+    const reBare = /import\s+["']([^"']+)["']/g;
+    const reReq = /(?:const|let|var)\s+(.+?)\s*=\s*require\(\s*["']([^"']+)["']\s*\)/g;
+    let m: RegExpExecArray | null;
+    while ((m = reFrom.exec(content))) push(m[2]!, namesFromClause(m[1]!));
+    while ((m = reBare.exec(content))) push(m[1]!, []);
+    while ((m = reReq.exec(content))) push(m[2]!, namesFromClause(m[1]!));
+  } else if (lang === "python") {
+    const reFrom = /^\s*from\s+([\w.]+)\s+import\s+(.+)$/gm;
+    const reImp = /^\s*import\s+([\w.]+)/gm;
+    let m: RegExpExecArray | null;
+    while ((m = reFrom.exec(content))) push(m[1]!, m[2]!.split(",").map((s) => s.trim().split(" ")[0]!).filter(Boolean));
+    while ((m = reImp.exec(content))) push(m[1]!, []);
+  } else if (lang === "go") {
+    const reImp = /"([^"]+)"/g;
+    const block = content.match(/import\s*\(([\s\S]*?)\)/);
+    if (block) {
+      let m: RegExpExecArray | null;
+      while ((m = reImp.exec(block[1]!))) push(m[1]!, []);
+    }
+  }
+  return out;
+}
+
+function namesFromClause(clause: string): string[] {
+  const named = clause.match(/\{([^}]*)\}/);
+  const names: string[] = [];
+  if (named) names.push(...named[1]!.split(",").map((s) => s.trim().split(/\s+as\s+/)[0]!.trim()).filter(Boolean));
+  const def = clause.replace(/\{[^}]*\}/, "").replace(/\*\s+as\s+\w+/, "").split(",")[0]?.trim();
+  if (def && /^[A-Za-z_$]/.test(def)) names.push(def);
+  return names;
+}
+
+/** Resolve um especificador local ('./x') para um caminho relativo do projeto. */
+export function resolveModule(fromRel: string, module: string, root: string): string | null {
+  if (!module.startsWith(".")) return null; // dependencia externa (node_modules etc.)
+  const baseDir = join(root, fromRel, "..");
+  const target = join(baseDir, module);
+  const exts = ["", ".ts", ".tsx", ".js", ".jsx", ".py", ".go", "/index.ts", "/index.js"];
+  for (const e of exts) {
+    const cand = target + e;
+    if (existsSync(cand) && statSync(cand).isFile()) return relative(root, cand);
+  }
+  return relative(root, target);
 }
 
 type Rule = { re: RegExp; kind: string };

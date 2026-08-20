@@ -33,6 +33,15 @@ export async function startChat(): Promise<void> {
   const cwd = process.cwd();
 
   console.log(banner(cfg.provider, provider.offline, site));
+
+  // Auto-indexa a pasta atual (incremental) para o contexto de projeto funcionar.
+  try {
+    const s = indexProject(db, cwd);
+    if (s.files > 0) console.log(brand.dim(`\nprojeto indexado: ${s.files} arquivos, ${s.symbols} simbolos`));
+  } catch {
+    /* pasta sem codigo indexavel — ok */
+  }
+
   if (!health.ok) {
     console.log(brand.warn(`\n! ${health.detail}`));
     if (cfg.provider !== "heuristic") {

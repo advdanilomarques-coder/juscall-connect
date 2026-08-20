@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
@@ -10,6 +10,7 @@ import {
   runHealth,
   indexProject,
   retrieveContext,
+  retrieveFileContext,
   terminalGhost,
   explainCommand,
   isDangerous,
@@ -75,7 +76,7 @@ app.post("/api/chat", async (req, reply) => {
   let context: string | undefined;
   if (body.projectRoot && userText) {
     try {
-      context = retrieveContext(state.db, body.projectRoot, userText) || undefined;
+      context = retrieveContext(state.db, body.projectRoot, userText, { maxSymbols: 32, maxChars: 3200 }) || undefined;
     } catch {
       context = undefined;
     }
@@ -133,29 +134,46 @@ app.post("/api/complete", async (req) => {
     path?: string;
     projectRoot?: string;
   };
+  const level = state.config.inline.level;
+  if (level === "OFF") return { text: "", confidence: 0, multiline: false };
+
+  // Contexto CRUZADO: simbolos do arquivo atual + dos modulos que ele importa.
   let context: string | undefined;
   if (b.projectRoot) {
     const word = (b.prefix.match(/[A-Za-z_$][A-Za-z0-9_$]*$/) ?? [""])[0];
-    if (word.length >= 3) {
-      try {
+    try {
+      if (b.path) {
+        const rel = relative(b.projectRoot, b.path);
+        context = retrieveFileContext(state.db, b.projectRoot, rel, word, { maxSymbols: 16 }) || undefined;
+      } else if (word.length >= 3) {
         context = retrieveContext(state.db, b.projectRoot, word, { maxSymbols: 30 }) || undefined;
-      } catch {
-        /* ignore */
       }
+    } catch {
+      /* ignore */
     }
   }
-  const result = await state.getProvider().complete({
+
+  const request = {
     prefix: b.prefix ?? "",
     suffix: b.suffix ?? "",
     language: b.language ?? "plaintext",
     path: b.path,
     context,
-  });
+    level,
+  };
+
+  // Cache (PDF item 25): reutiliza enquanto o contexto relevante nao muda.
+  const cached = state.completionCache.get(request);
+  if (cached) return cached;
+
+  const result = await state.getProvider().complete(request);
   // Confidence gate (PDF item 21): abaixo do minimo, nao sugere.
-  if (result.confidence < state.config.inline.minConfidence) {
-    return { text: "", confidence: result.confidence, multiline: false };
-  }
-  return result;
+  const gated =
+    result.confidence < state.config.inline.minConfidence
+      ? { text: "", confidence: result.confidence, multiline: false }
+      : result;
+  if (gated.text) state.completionCache.set(request, gated);
+  return gated;
 });
 
 // -------------------- Terminal AI --------------------

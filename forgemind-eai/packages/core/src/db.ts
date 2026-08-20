@@ -96,6 +96,23 @@ function migrate(db: DB): void {
         END;
       `);
     },
+    // v3 — grafo de dependencias (imports) para contexto cruzado (PDF item 17/18)
+    () => {
+      db.exec(`
+        CREATE TABLE project_imports (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          file_id INTEGER NOT NULL REFERENCES project_files(id) ON DELETE CASCADE,
+          module TEXT NOT NULL,          -- especificador cru: './foo', 'react', 'pkg/x'
+          resolved_path TEXT,            -- caminho relativo resolvido no projeto (se local)
+          names TEXT                     -- simbolos importados, separados por virgula
+        );
+        CREATE INDEX idx_imports_file ON project_imports(file_id);
+        CREATE INDEX idx_imports_resolved ON project_imports(resolved_path);
+
+        -- Marca exports para ranquear melhor o que e "API publica" de um arquivo.
+        ALTER TABLE project_symbols ADD COLUMN exported INTEGER NOT NULL DEFAULT 0;
+      `);
+    },
   ];
 
   const tx = db.transaction((from: number) => {

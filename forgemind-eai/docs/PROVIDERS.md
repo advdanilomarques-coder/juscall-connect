@@ -12,29 +12,36 @@ Motor determinístico, sem modelo e sem download. Forte em:
 
 Não é um LLM — não "conversa" sobre assuntos gerais em profundidade. Use‑o como turbo instantâneo.
 
-## local-llama (offline, recomendado para conversa)
+## local-llama (offline, recomendado para código e inline)
 
 LLM local via [`node-llama-cpp`](https://github.com/withcatai/node-llama-cpp) (llama.cpp).
 **Não é Ollama e não hospeda nada.** Roda um GGUF direto na CPU.
 
 ```bash
-./scripts/model-pull.sh 3b      # Qwen2.5-3B (~2GB) — recomendado p/ 10GB RAM
+./scripts/model-pull.sh 3b      # Qwen2.5-Coder-3B (~2GB) — código + FIM p/ inline
 ./scripts/model-pull.sh 1.5b    # modo rápido (menos RAM)
 npm install node-llama-cpp --workspace @forgemind/core
 ```
 
 Depois: em `/config` escolha `local-llama` e confirme o caminho do modelo.
 
-**Expectativa de desempenho em Mac Intel antigo (DDR3):** respostas em segundos a dezenas de
-segundos, dependendo do tamanho do modelo. É o preço do offline ilimitado e gratuito.
+**Por que Qwen2.5‑Coder:** é forte em código e **suporta FIM/infill**, que é o que o Ghost Text
+usa para completar no meio do arquivo (prefixo + sufixo). Também responde assuntos gerais.
+
+**Inline (Ghost Text) com modelo:** o `complete()` usa `generateInfillCompletion(prefix, suffix)`
+com orçamento curto por nível (LOW/BALANCED/HIGH), **timeout** e **cache**; se o modelo demorar
+ou não estiver pronto, cai no motor heurístico — o editor nunca trava (PDF 24/25/31).
+
+**Expectativa de desempenho em Mac Intel antigo (DDR3):** respostas de chat em segundos a
+dezenas de segundos; inline curto é mais rápido. É o preço do offline ilimitado e gratuito.
 
 ### Escolha de modelo
 
-| Modelo | RAM | Velocidade (Intel antigo) | Qualidade geral |
+| Modelo | RAM | Velocidade (Intel antigo) | Uso |
 |---|---|---|---|
-| Qwen2.5‑1.5B | ~1.5 GB | mais rápida | básica |
-| **Qwen2.5‑3B** | ~3 GB | média | **boa (recomendado)** |
-| Qwen2.5‑7B | ~6 GB | lenta | melhor (Mac 16GB+) |
+| Qwen2.5‑Coder‑1.5B | ~1.5 GB | mais rápida | inline leve / modo rápido |
+| **Qwen2.5‑Coder‑3B** | ~3 GB | média | **código + inline (recomendado)** |
+| Qwen2.5‑Coder‑7B | ~6 GB | lenta | melhor qualidade (Mac 16GB+) |
 
 ## gemini (online, opcional)
 

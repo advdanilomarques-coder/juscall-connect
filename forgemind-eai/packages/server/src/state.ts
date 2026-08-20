@@ -3,6 +3,7 @@ import {
   loadConfig,
   openDatabase,
   MemoryStore,
+  CompletionCache,
   type AIProvider,
   type ForgeConfig,
   type DB,
@@ -16,6 +17,7 @@ export class ServerState {
   config: ForgeConfig;
   db: DB;
   memory: MemoryStore;
+  completionCache = new CompletionCache();
   private provider: AIProvider;
   private providerKey: string;
 
@@ -31,6 +33,7 @@ export class ServerState {
     if (this.providerKey !== this.config.provider) {
       this.provider = createProvider(this.config);
       this.providerKey = this.config.provider;
+      this.completionCache.clear(); // cache invalido ao trocar de cerebro
     }
     return this.provider;
   }

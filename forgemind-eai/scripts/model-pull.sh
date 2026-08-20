@@ -6,15 +6,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p models
 
+# Qwen2.5-Coder: forte em codigo + FIM/infill (ideal p/ inline). "3b" recomendado.
 SIZE="${1:-3b}"
 case "$SIZE" in
   3b)
-    NAME="qwen2.5-3b-instruct-q4_k_m.gguf"
-    URL="https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
+    NAME="qwen2.5-coder-3b-instruct-q4_k_m.gguf"
+    URL="https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf"
     ;;
   1.5b)
-    NAME="qwen2.5-1.5b-instruct-q4_k_m.gguf"
-    URL="https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    NAME="qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
+    URL="https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
     ;;
   *)
     echo "uso: model-pull.sh [3b|1.5b]" >&2; exit 1;;

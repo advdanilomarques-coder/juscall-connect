@@ -5,6 +5,7 @@ export * from "./redaction.js";
 export * from "./logger.js";
 export * from "./indexer.js";
 export * from "./context.js";
+export * from "./completion-cache.js";
 export * from "./terminal.js";
 export * from "./health.js";
 export * from "./providers/index.js";

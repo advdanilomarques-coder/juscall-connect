@@ -121,21 +121,21 @@ program
 
 program
   .command("model:pull")
-  .description("instrucoes para baixar o modelo local (Qwen2.5-3B)")
+  .description("instrucoes para baixar o modelo local (Qwen2.5-Coder-3B)")
   .action(() => {
     const cfg = loadConfig();
     console.log(
       [
         brand.primary("\n◆ Baixar o cerebro local (uma vez, com internet; depois offline)\n"),
-        "Recomendado p/ seu Mac (10GB): " + brand.accent("Qwen2.5-3B-Instruct Q4_K_M") + " (~2GB)",
+        "Recomendado (codigo/inline): " + brand.accent("Qwen2.5-Coder-3B Q4_K_M") + " (~2GB, com FIM p/ inline)",
         "",
         brand.dim("  # opcao 1: script pronto"),
         "  ./scripts/model-pull.sh",
         "",
         brand.dim("  # opcao 2: manual"),
         "  mkdir -p models && cd models",
-        "  curl -L -o qwen2.5-3b-instruct-q4_k_m.gguf \\",
-        "    https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf",
+        "  curl -L -o qwen2.5-coder-3b-instruct-q4_k_m.gguf \\",
+        "    https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf",
         "",
         "Depois, em " + brand.you(`http://${cfg.host}:${cfg.port}`) + " (/config) escolha o provider " + brand.accent("local-llama") + ".",
         brand.dim("Modo rapido (menos RAM): troque para o modelo 1.5B.\n"),
