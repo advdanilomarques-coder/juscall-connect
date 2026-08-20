@@ -165,6 +165,7 @@ program
       process.exit(1);
     }
     saveConfig({ provider: name as "heuristic" | "local-llama" | "gemini" });
+    syncProjectEnv({ AI_PROVIDER: name }); // evita que o .env do projeto sobreponha
     console.log(brand.ok(`✔ provider agora e ${name}.`));
     if (name === "gemini" && !process.env.GEMINI_API_KEY) {
       console.log(brand.warn("  falta a chave. Rode: forgemind gemini SUA_CHAVE"));
@@ -184,6 +185,7 @@ program
       GEMINI_MODEL: model ?? cfg.gemini.model ?? "gemini-1.5-flash",
     };
     writeEnv(envPath, kv);
+    syncProjectEnv({ AI_PROVIDER: "hybrid", GEMINI_MODEL: kv.GEMINI_MODEL! }); // mantem o projeto em sincronia
     saveConfig({ provider: "hybrid", gemini: { model: kv.GEMINI_MODEL } as any });
     console.log(brand.ok(`\n✔ Gemini ativado em modo HIBRIDO (modelo ${kv.GEMINI_MODEL}).`));
     console.log(brand.dim("  chat = Gemini (nuvem)  •  inline = local/heuristico (rapido e privado)"));
@@ -191,6 +193,12 @@ program
     console.log(brand.dim("  funciona agora de qualquer diretorio: forgemind"));
     console.log(brand.dim("  (chat 100% Gemini: forgemind provider gemini)\n"));
   });
+
+/** Sincroniza o .env do projeto (se existir) para nao sobrepor o provider global. */
+function syncProjectEnv(kv: Record<string, string>): void {
+  const projectEnv = resolve(here, "../../../.env");
+  if (existsSync(projectEnv)) writeEnv(projectEnv, kv);
+}
 
 /** Atualiza (ou insere) pares chave=valor num arquivo .env preservando o resto. */
 function writeEnv(path: string, kv: Record<string, string>): void {
