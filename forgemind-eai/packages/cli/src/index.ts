@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { existsSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import {
+  loadEnvFiles,
   loadConfig,
+  saveConfig,
   openDatabase,
   MemoryStore,
   runHealth,
@@ -14,6 +16,10 @@ import {
 } from "@forgemind/core";
 import { brand } from "./ui.js";
 import { startChat } from "./chat.js";
+
+// Carrega ./.env e ~/.forgemind/.env antes de tudo, para que Gemini/local-llama
+// funcionem de QUALQUER diretorio sem erro de chave ausente.
+loadEnvFiles();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const serverEntry = resolve(here, "../../server/dist/index.js");
@@ -142,5 +148,62 @@ program
       ].join("\n"),
     );
   });
+
+program
+  .command("provider [name]")
+  .description("mostra ou troca o cerebro: heuristic | local-llama | gemini")
+  .action((name?: string) => {
+    const cfg = loadConfig();
+    if (!name) {
+      console.log(`\n  provider atual: ${brand.accent(cfg.provider)}`);
+      console.log(brand.dim("  troque com: forgemind provider gemini\n"));
+      return;
+    }
+    const valid = ["heuristic", "local-llama", "gemini"];
+    if (!valid.includes(name)) {
+      console.log(brand.err(`  invalido: ${name}. Use: ${valid.join(" | ")}`));
+      process.exit(1);
+    }
+    saveConfig({ provider: name as "heuristic" | "local-llama" | "gemini" });
+    console.log(brand.ok(`✔ provider agora e ${name}.`));
+    if (name === "gemini" && !process.env.GEMINI_API_KEY) {
+      console.log(brand.warn("  falta a chave. Rode: forgemind gemini SUA_CHAVE"));
+    }
+  });
+
+program
+  .command("gemini <apikey> [model]")
+  .description("ativa o Gemini em qualquer terminal (salva a chave no .env global)")
+  .action((apikey: string, model?: string) => {
+    const cfg = loadConfig();
+    mkdirSync(cfg.home, { recursive: true });
+    const envPath = join(cfg.home, ".env");
+    const kv: Record<string, string> = {
+      AI_PROVIDER: "gemini",
+      GEMINI_API_KEY: apikey,
+      GEMINI_MODEL: model ?? cfg.gemini.model ?? "gemini-1.5-flash",
+    };
+    writeEnv(envPath, kv);
+    saveConfig({ provider: "gemini", gemini: { model: kv.GEMINI_MODEL } as any });
+    console.log(brand.ok(`\n✔ Gemini ativado (modelo ${kv.GEMINI_MODEL}).`));
+    console.log(brand.dim(`  chave salva em ${envPath} (fora do git, nunca no config.json).`));
+    console.log(brand.dim("  funciona agora de qualquer diretorio: forgemind\n"));
+  });
+
+/** Atualiza (ou insere) pares chave=valor num arquivo .env preservando o resto. */
+function writeEnv(path: string, kv: Record<string, string>): void {
+  const existing = existsSync(path) ? readFileSync(path, "utf8").split("\n") : [];
+  const seen = new Set<string>();
+  const out = existing.map((line) => {
+    const m = line.match(/^([A-Z0-9_]+)=/);
+    if (m && kv[m[1]!] !== undefined) {
+      seen.add(m[1]!);
+      return `${m[1]}=${kv[m[1]!]}`;
+    }
+    return line;
+  });
+  for (const [k, v] of Object.entries(kv)) if (!seen.has(k)) out.push(`${k}=${v}`);
+  writeFileSync(path, out.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n").replace(/\n*$/, "\n"));
+}
 
 program.parseAsync(process.argv);

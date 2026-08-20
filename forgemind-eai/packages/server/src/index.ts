@@ -5,6 +5,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import {
+  loadEnvFiles,
   saveConfig,
   redactObject,
   runHealth,
@@ -20,6 +21,7 @@ import {
 } from "@forgemind/core";
 import { ServerState } from "./state.js";
 
+loadEnvFiles(); // ./.env e ~/.forgemind/.env (Gemini/local-llama de qualquer lugar)
 const state = new ServerState();
 configureLogger({ file: logger.fileIn(state.config.home) });
 
