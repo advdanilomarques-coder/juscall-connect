@@ -1,0 +1,30 @@
+{
+  "name": "forgemind-eai-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ForgeMind EAI — IA pessoal de desenvolvimento, offline-first, terminal + web + extensao VS Code. Sem Ollama, sem hospedagem.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20 <23",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/server",
+    "packages/cli",
+    "packages/web",
+    "packages/extension"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @forgemind/core && npm run build --workspace @forgemind/server && npm run build --workspace @forgemind/cli",
+    "build:web": "npm run build --workspace @forgemind/web",
+    "build:extension": "npm run build --workspace packages/extension",
+    "build:all": "npm run build && npm run build:web && npm run build:extension",
+    "dev:server": "npm run dev --workspace @forgemind/server",
+    "dev:web": "npm run dev --workspace @forgemind/web",
+    "test": "npm run test --workspace @forgemind/core",
+    "doctor": "node packages/cli/dist/index.js doctor",
+    "start": "node packages/cli/dist/index.js start",
+    "clean": "rm -rf packages/*/dist packages/*/node_modules node_modules"
+  }
+}

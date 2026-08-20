@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build output
+dist/
+build/
+*.vsix
+packages/web/dist/
+
+# ForgeMind local data (NEVER commit user data / secrets)
+.env
+.env.local
+*.local
+data/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+backups/
+logs/
+*.log
+
+# Local models (podem ser grandes — nunca versionar)
+models/
+*.gguf
+*.bin
+
+# OS / editor
+.DS_Store
+.vscode/
+!.vscode/extensions.json
+*.tsbuildinfo

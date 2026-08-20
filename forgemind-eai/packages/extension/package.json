@@ -1,0 +1,47 @@
+{
+  "name": "forgemind-eai",
+  "displayName": "ForgeMind EAI",
+  "description": "IA de desenvolvimento local e offline: Ghost Text, chat e Terminal AI via backend ForgeMind.",
+  "version": "0.1.0",
+  "publisher": "forgemind",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Machine Learning", "Programming Languages", "Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "forgemind.chat", "title": "ForgeMind: Abrir Chat" },
+      { "command": "forgemind.explainSelection", "title": "ForgeMind: Explicar seleção" },
+      { "command": "forgemind.openSite", "title": "ForgeMind: Abrir meu site (localhost)" }
+    ],
+    "configuration": {
+      "title": "ForgeMind EAI",
+      "properties": {
+        "forgemind.serverUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:4319",
+          "description": "URL do backend local do ForgeMind."
+        },
+        "forgemind.inlineEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ativa o Ghost Text inline."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --external:vscode --outfile=dist/extension.js --format=cjs",
+    "watch": "npm run build -- --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.3"
+  }
+}
