@@ -3,6 +3,7 @@ import { api, type Info } from "./api.js";
 import { Chat } from "./components/Chat.js";
 import { Settings } from "./components/Settings.js";
 import { Memory } from "./components/Memory.js";
+import { Landing } from "./components/Landing.js";
 import { IconChat, IconConfig, IconMemory, IconTheme } from "./components/icons.js";
 
 type Tab = "chat" | "memory" | "config";
@@ -11,12 +12,20 @@ type Theme = "system" | "dark" | "light";
 export function App() {
   const [tab, setTab] = useState<Tab>("chat");
   const [info, setInfo] = useState<Info | null>(null);
+  const [entered, setEntered] = useState<boolean>(sessionStorage.getItem("fm-entered") === "1");
   const [theme, setTheme] = useState<Theme>((localStorage.getItem("fm-theme") as Theme) || "system");
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     api.info().then(setInfo).catch(() => setInfo(null));
   }, []);
+
+  function enter() {
+    sessionStorage.setItem("fm-entered", "1");
+    setEntered(true);
+  }
+
+  if (!entered) return <Landing info={info} onEnter={enter} />;
 
   useEffect(() => {
     const root = document.documentElement;
@@ -39,7 +48,16 @@ export function App() {
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand">
+        <div
+          className="brand"
+          role="button"
+          title="Voltar à tela inicial"
+          style={{ cursor: "pointer" }}
+          onClick={() => {
+            sessionStorage.removeItem("fm-entered");
+            setEntered(false);
+          }}
+        >
           <div className="mark">◆</div>
           <div>
             <h1>ForgeMind</h1>
