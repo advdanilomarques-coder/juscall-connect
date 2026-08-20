@@ -2,7 +2,7 @@
 # Sobe o backend local do ForgeMind (site + API). Nunca hospeda publicamente.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-[ -f .env ] && export $(grep -v '^#' .env | grep -v '^$' | xargs) || true
+[ -f .env ] && export $(grep -v '^#' .env | grep -v '^$' | grep -v '=$' | xargs) || true
 
 if [ ! -f packages/server/dist/index.js ]; then
   echo "servidor nao compilado — rodando build..."

@@ -31,11 +31,12 @@ function applyEnvFile(path: string): void {
     const eq = line.indexOf("=");
     if (eq <= 0) continue;
     const key = line.slice(0, eq).trim();
-    if (key in process.env) continue; // nunca sobrescreve
+    if (process.env[key]) continue; // so pula se ja houver valor NAO-vazio (empty nao sombreia)
     let val = line.slice(eq + 1).trim();
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1);
     }
+    if (!val) continue; // nunca define valor vazio (evita sombrear .env global)
     process.env[key] = val;
   }
 }
