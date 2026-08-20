@@ -32,6 +32,24 @@ await app.register(cors, {
   origin: [/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/],
 });
 
+// Hardening (defesa contra CSRF / DNS-rebinding em servico localhost):
+//  - rejeita Origin de fora do localhost (CORS so ajusta headers de resposta;
+//    aqui bloqueamos a requisicao de fato antes de executar qualquer efeito);
+//  - valida o Host para impedir rebinding via dominio que resolve p/ 127.0.0.1.
+const LOCAL_RE = /^(localhost|127\.0\.0\.1)(:\d+)?$/;
+app.addHook("onRequest", async (req, reply) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      if (!LOCAL_RE.test(new URL(origin).host)) return reply.code(403).send({ error: "origem nao permitida" });
+    } catch {
+      return reply.code(403).send({ error: "origem invalida" });
+    }
+  }
+  const host = req.headers.host;
+  if (host && !LOCAL_RE.test(host)) return reply.code(403).send({ error: "host nao permitido" });
+});
+
 // Servir o site (build do web) se existir, para que o localhost mostre "seu site".
 const here = dirname(fileURLToPath(import.meta.url));
 const webDist = resolve(here, "../../web/dist");
