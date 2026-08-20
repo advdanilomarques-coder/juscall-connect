@@ -49,10 +49,16 @@ export class LocalLlamaProvider implements AIProvider {
       const spec: string = "node-llama-cpp";
       this.mod = await import(spec);
       return this.mod;
-    } catch {
+    } catch (e) {
+      const err = e as Error & { code?: string };
+      const notFound = err.code === "ERR_MODULE_NOT_FOUND" || /Cannot find (module|package)/i.test(err.message);
       throw new ProviderUnavailableError(
-        "node-llama-cpp nao esta instalado.",
-        "Rode: npm install node-llama-cpp --workspace @forgemind/core (precisa de internet uma vez).",
+        notFound
+          ? "node-llama-cpp nao esta instalado."
+          : `node-llama-cpp instalado, mas falhou ao carregar: ${err.message}`,
+        notFound
+          ? "Rode: npm install node-llama-cpp --workspace @forgemind/core (precisa de internet uma vez)."
+          : "O runtime nativo nao carregou (Mac/glibc/binario). Rode o diagnostico ou tente: npx --yes node-llama-cpp download",
       );
     }
   }
