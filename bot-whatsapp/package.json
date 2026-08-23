@@ -1,0 +1,18 @@
+{
+  "name": "bot-whatsapp-tms",
+  "version": "1.0.0",
+  "description": "Robô de atendimento no WhatsApp da TMS Advogados Associados (vistos, juros abusivos, busca e apreensão).",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}
