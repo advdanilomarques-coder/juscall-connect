@@ -1,6 +1,6 @@
-<title>Ju · Atendimento JusCall</title>
+<title>TMS Advogados · Atendimento</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Assistente virtual do escritório JusCall: vistos para Portugal, juros abusivos e busca e apreensão de veículos.">
+<meta name="description" content="Atendimento online da TMS Advogados Associados: vistos para Portugal, juros abusivos e busca e apreensão de veículos.">
 <style>
   :root {
     --ground: #eef1f6;
@@ -83,44 +83,42 @@
   }
   @media (min-width: 520px) {
     body { align-items: center; padding: 24px; }
-    .app { height: min(860px, 94dvh); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
+    .app { height: min(880px, 94dvh); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
   }
 
-  /* Header */
   header {
     background: var(--primary);
     color: var(--primary-ink);
-    padding: 16px 18px calc(16px + env(safe-area-inset-top, 0px));
-    padding-top: max(16px, env(safe-area-inset-top, 0px));
+    padding: max(16px, env(safe-area-inset-top, 0px)) 18px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
   }
   .avatar {
-    width: 44px; height: 44px; flex: 0 0 auto;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--primary-ink) 16%, transparent);
+    width: 46px; height: 46px; flex: 0 0 auto;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--primary-ink) 15%, transparent);
     display: grid; place-items: center;
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600; font-size: 1.05rem; letter-spacing: .5px;
   }
-  .avatar svg { width: 24px; height: 24px; }
   .id h1 {
     margin: 0;
     font-family: "Fraunces", Georgia, serif;
-    font-size: 1.18rem;
+    font-size: 1.12rem;
     font-weight: 600;
     letter-spacing: .2px;
-    line-height: 1.1;
+    line-height: 1.15;
   }
   .id p {
-    margin: 2px 0 0;
+    margin: 3px 0 0;
     font-size: .74rem;
-    opacity: .85;
+    opacity: .9;
     display: flex; align-items: center; gap: 6px;
     letter-spacing: .3px;
   }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #35d07f; box-shadow: 0 0 0 3px color-mix(in srgb,#35d07f 30%, transparent); }
 
-  /* Chat area */
   .chat {
     flex: 1;
     overflow-y: auto;
@@ -137,7 +135,7 @@
   .row.bot { justify-content: flex-start; }
   .row.user { justify-content: flex-end; }
   .bubble {
-    max-width: 82%;
+    max-width: 84%;
     padding: 11px 14px;
     font-size: .93rem;
     line-height: 1.5;
@@ -149,7 +147,8 @@
   .bot .bubble { background: var(--bot-bubble); color: var(--bot-ink); border-bottom-left-radius: 6px; }
   .user .bubble { background: var(--user-bubble); color: var(--user-ink); border-bottom-right-radius: 6px; }
   .bubble strong { font-weight: 700; }
-  .bubble a { color: inherit; }
+  .bubble ul { margin: 6px 0 0; padding-left: 18px; }
+  .bubble li { margin: 3px 0; }
   @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
 
   .typing { display: inline-flex; gap: 4px; align-items: center; }
@@ -158,11 +157,7 @@
   .typing span:nth-child(3){ animation-delay: .4s; }
   @keyframes blink { 0%,60%,100%{ transform: translateY(0); opacity:.35 } 30%{ transform: translateY(-4px); opacity:.9 } }
 
-  /* Quick replies + actions */
-  .actions {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    padding: 4px 14px 12px;
-  }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 12px; }
   .chip {
     appearance: none; border: 1px solid var(--line);
     background: var(--panel);
@@ -201,14 +196,10 @@
 
 <div class="app">
   <header>
-    <div class="avatar" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3v18M7 21h10M5 7l14-2"/><path d="M5 7l-2.5 6a3 3 0 0 0 5 0L5 7z"/><path d="M19 5l-2.5 6a3 3 0 0 0 5 0L19 5z"/>
-      </svg>
-    </div>
+    <div class="avatar" aria-hidden="true">TMS</div>
     <div class="id">
-      <h1>Ju · Assistente JusCall</h1>
-      <p><span class="dot"></span> Online agora · resposta imediata</p>
+      <h1>TMS Advogados Associados</h1>
+      <p><span class="dot"></span> Ju · assistente virtual · online agora</p>
     </div>
   </header>
 
@@ -228,13 +219,11 @@
 <script>
 (function () {
   var WHATSAPP = "5511991537423";
+  var OFFICE = "TMS Advogados Associados";
   var chat = document.getElementById("chat");
   var actions = document.getElementById("actions");
 
-  function waLink(msg) {
-    return "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(msg);
-  }
-
+  function waLink(msg) { return "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(msg); }
   function scrollDown() { chat.scrollTop = chat.scrollHeight; }
 
   function addBubble(who, html) {
@@ -249,10 +238,9 @@
     return b;
   }
 
-  // Sequenced bot messages with a typing indicator
   function botSay(messages, done) {
     var queue = messages.slice();
-    function next() {
+    (function next() {
       if (!queue.length) { if (done) done(); return; }
       var typingRow = document.createElement("div");
       typingRow.className = "row bot";
@@ -260,14 +248,9 @@
       chat.appendChild(typingRow);
       scrollDown();
       var text = queue.shift();
-      var delay = Math.min(1100, 350 + text.replace(/<[^>]+>/g, "").length * 12);
-      setTimeout(function () {
-        chat.removeChild(typingRow);
-        addBubble("bot", text);
-        next();
-      }, delay);
-    }
-    next();
+      var delay = Math.min(1100, 350 + text.replace(/<[^>]+>/g, "").length * 11);
+      setTimeout(function () { chat.removeChild(typingRow); addBubble("bot", text); next(); }, delay);
+    })();
   }
 
   function clearActions() { actions.innerHTML = ""; }
@@ -279,24 +262,16 @@
     if (isWa) {
       b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.23 8.23 0 0 1-1.26-4.35c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.19 8.19 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43l-.48-.01c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03 0 1.2.87 2.35.99 2.51.12.16 1.71 2.62 4.15 3.67.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>';
       b.appendChild(document.createTextNode(label));
-    } else {
-      b.textContent = label;
-    }
+    } else { b.textContent = label; }
     b.addEventListener("click", onClick);
     actions.appendChild(b);
     return b;
   }
 
   function waChip(message) {
-    var a = addChip("Falar com advogado no WhatsApp", function () {
-      window.open(waLink(message), "_blank");
-    }, true);
-    return a;
+    addChip("Falar com advogado no WhatsApp", function () { window.open(waLink(message), "_blank"); }, true);
   }
-
-  function menuChip() {
-    addChip("↩ Voltar ao início", function () { userPicked("Voltar ao início", start); });
-  }
+  function menuChip() { addChip("↩ Voltar ao início", function () { userPicked("Voltar ao início", start); }); }
 
   function userPicked(label, handler) {
     clearActions();
@@ -304,102 +279,155 @@
     setTimeout(handler, 250);
   }
 
-  // ---------- Conversation flows ----------
+  // Standard follow-up menu for every area: docs, fees, WhatsApp, home
+  function infoMenu(area) {
+    waChip(area.wa);
+    addChip("📄 Documentos necessários", function () { userPicked("Quais documentos eu preciso?", function () { showDocs(area); }); });
+    addChip("💰 Quanto custa?", function () { userPicked("Quanto custa / como são os honorários?", function () { showFees(area); }); });
+    menuChip();
+  }
 
-  function start() {
-    clearActions();
+  function showDocs(area) {
     botSay([
-      "Olá! Eu sou a <strong>Ju</strong>, assistente virtual do escritório <strong>JusCall</strong>. 👋",
-      "Posso te dar uma orientação inicial e já te conectar com um advogado. Sobre qual assunto você precisa de ajuda?"
+      "Para o seu caso de <strong>" + area.nome + "</strong>, geralmente pedimos:",
+      area.docs,
+      "Não se preocupe se faltar algum documento — o advogado te orienta sobre como obter cada um. 😉"
+    ], function () { infoMenu(area); });
+  }
+
+  function showFees() {
+    botSay([
+      "A <strong>primeira conversa</strong> para entendermos o seu caso é <strong>gratuita e sem compromisso</strong>. 🤝",
+      "Os honorários são definidos <strong>somente após a análise</strong>, de acordo com a complexidade do caso. Assim você recebe um valor justo e transparente, combinado antes de qualquer providência — sem surpresas.",
+      "Quando possível, também trabalhamos com <strong>parcelamento</strong> e formas facilitadas de pagamento."
     ], function () {
-      addChip("🇵🇹 Visto para Portugal", function () { userPicked("Quero ajuda com visto para Portugal", vistoStart); });
-      addChip("💰 Juros abusivos", function () { userPicked("Acho que estou pagando juros abusivos", jurosStart); });
-      addChip("🚗 Financiamento / busca e apreensão", function () { userPicked("Problema com financiamento do meu veículo", carroStart); });
+      var area = showFees._area;
+      if (area) { infoMenu(area); } else { menuChip(); }
     });
   }
 
-  // --- Visto Portugal ---
+  // ---------- Areas ----------
+  var VISTO = {
+    nome: "Visto para Portugal",
+    wa: "Ola! Vim pelo atendimento online da " + OFFICE + ". Preciso de ajuda com VISTO PARA PORTUGAL. Meu nome e: ",
+    docs: "<ul>" +
+      "<li>Passaporte válido (mínimo 6 meses)</li>" +
+      "<li>Fotos recentes tipo passaporte</li>" +
+      "<li>Comprovação de meios de subsistência (renda/saldo)</li>" +
+      "<li>Seguro de saúde/viagem válido em Portugal</li>" +
+      "<li>Comprovativo de onde vai morar (alojamento)</li>" +
+      "<li>Certidão de antecedentes criminais</li>" +
+      "<li>Documento específico do seu tipo de visto (contrato de trabalho, carta da faculdade, comprovação de renda ou certidões da família)</li>" +
+      "</ul>"
+  };
+  var JUROS = {
+    nome: "Revisão por juros abusivos",
+    wa: "Ola! Vim pelo atendimento online da " + OFFICE + ". Quero uma REVISAO por JUROS ABUSIVOS no meu contrato. Meu nome e: ",
+    docs: "<ul>" +
+      "<li>Contrato do financiamento/empréstimo (todas as páginas)</li>" +
+      "<li>Carnê ou tabela com as parcelas</li>" +
+      "<li>Comprovantes de pagamento (boletos/extratos)</li>" +
+      "<li>Extrato do saldo devedor atualizado</li>" +
+      "<li>RG, CPF e comprovante de residência</li>" +
+      "</ul>"
+  };
+  var CARRO = {
+    nome: "Financiamento / busca e apreensão",
+    wa: "Ola! Vim pelo atendimento online da " + OFFICE + ". Tenho um problema de FINANCIAMENTO / BUSCA E APREENSAO do meu veiculo. Meu nome e: ",
+    docs: "<ul>" +
+      "<li>Contrato de financiamento do veículo</li>" +
+      "<li>Documento do veículo (CRLV)</li>" +
+      "<li>Comprovantes das parcelas pagas</li>" +
+      "<li>Boletos em atraso</li>" +
+      "<li>Notificação ou citação recebida (se já houver ação)</li>" +
+      "<li>RG, CPF e comprovante de residência</li>" +
+      "</ul>"
+  };
+
+  // ---------- Flows ----------
+  function start() {
+    clearActions();
+    showFees._area = null;
+    botSay([
+      "Olá! Seja bem-vindo(a) à <strong>" + OFFICE + "</strong>. 👋",
+      "Eu sou a <strong>Ju</strong>, assistente virtual do escritório. Posso tirar dúvidas iniciais, dizer quais documentos você precisa e já te conectar com um advogado.",
+      "Sobre qual assunto você precisa de ajuda?"
+    ], function () {
+      addChip("🇵🇹 Visto para Portugal", function () { userPicked("Quero ajuda com visto para Portugal", vistoStart); });
+      addChip("💰 Juros abusivos", function () { userPicked("Acho que pago juros abusivos", jurosStart); });
+      addChip("🚗 Financiamento / busca e apreensão", function () { userPicked("Problema com financiamento do veículo", carroStart); });
+    });
+  }
+
   function vistoStart() {
+    showFees._area = VISTO;
     botSay([
       "Ótimo! Ajudamos brasileiros a morar legalmente em Portugal. 🇵🇹",
       "Qual é o seu principal objetivo?"
     ], function () {
       addChip("Trabalhar", function () { userPicked("Quero trabalhar em Portugal", function(){ vistoResp("trabalho"); }); });
       addChip("Estudar", function () { userPicked("Quero estudar em Portugal", function(){ vistoResp("estudo"); }); });
-      addChip("Aposentado / renda própria", function () { userPicked("Tenho renda própria / sou aposentado", function(){ vistoResp("renda"); }); });
-      addChip("Reunir minha família", function () { userPicked("Quero levar / reunir minha família", function(){ vistoResp("familia"); }); });
+      addChip("Tenho renda própria / aposentado", function () { userPicked("Tenho renda própria / sou aposentado", function(){ vistoResp("renda"); }); });
+      addChip("Reunir minha família", function () { userPicked("Quero reunir minha família", function(){ vistoResp("familia"); }); });
     });
   }
   function vistoResp(tipo) {
     var m = {
-      trabalho: "Para trabalhar, os caminhos mais comuns são o <strong>Visto de Procura de Trabalho</strong> e o visto para <strong>trabalho subordinado</strong> (com contrato). Cidadãos de países da CPLP, como o Brasil, têm um processo facilitado.",
-      estudo: "Para estudar, existe o <strong>Visto de Estudante (D4)</strong>, que exige matrícula/aceitação em instituição portuguesa, comprovação de meios de subsistência e seguro de saúde.",
-      renda: "Se você tem renda própria (aposentadoria, aluguéis, investimentos), o <strong>Visto D7</strong> é o mais indicado. É preciso comprovar renda regular e ter onde morar em Portugal.",
-      familia: "No <strong>reagrupamento familiar</strong>, quem já tem residência legal em Portugal pode trazer cônjuge, filhos e, em certos casos, pais. A documentação do vínculo é essencial."
+      trabalho: "Para trabalhar, os caminhos mais comuns são o <strong>Visto de Procura de Trabalho</strong> e o visto para <strong>trabalho com contrato</strong>. Brasileiros têm processo facilitado pelo acordo da CPLP.",
+      estudo: "Para estudar, existe o <strong>Visto de Estudante (D4)</strong>. É preciso ter aceitação numa instituição de ensino, comprovar meios de subsistência e seguro de saúde.",
+      renda: "Com renda própria (aposentadoria, aluguéis, investimentos), o <strong>Visto D7</strong> costuma ser o ideal. Você comprova renda regular e onde vai morar em Portugal.",
+      familia: "No <strong>reagrupamento familiar</strong>, quem já tem residência legal em Portugal pode trazer cônjuge, filhos e, em alguns casos, os pais. As certidões do vínculo são essenciais."
     };
     botSay([
       m[tipo],
-      "Cada caso tem exigências específicas de documentos e prazos. O ideal é um advogado analisar o seu perfil e montar a estratégia certa para aprovar o seu visto.",
-      "Quer falar agora com um dos nossos advogados? É gratuito e sem compromisso."
-    ], function () {
-      waChip("Olá! Vim pelo chatbot da JusCall. Preciso de ajuda com VISTO PARA PORTUGAL (" + tipo + "). Meu nome é: ");
-      menuChip();
-    });
+      "Cada perfil tem exigências próprias de documentos e prazos. O ideal é um advogado montar a estratégia certa para aprovar o seu visto.",
+      "Posso te ajudar com mais alguma coisa?"
+    ], function () { infoMenu(VISTO); });
   }
 
-  // --- Juros abusivos ---
   function jurosStart() {
+    showFees._area = JUROS;
     botSay([
       "Entendo. Muitos contratos de banco e financeira cobram <strong>juros acima do permitido</strong>, tarifas indevidas e seguros embutidos. 💰",
       "Que tipo de contrato é esse?"
     ], function () {
-      addChip("Financiamento de veículo", function () { userPicked("É um financiamento de veículo", function(){ jurosResp(); }); });
-      addChip("Empréstimo / consignado", function () { userPicked("É um empréstimo ou consignado", function(){ jurosResp(); }); });
-      addChip("Cartão de crédito / cheque especial", function () { userPicked("É cartão de crédito ou cheque especial", function(){ jurosResp(); }); });
-      addChip("Financiamento imobiliário", function () { userPicked("É um financiamento imobiliário", function(){ jurosResp(); }); });
+      addChip("Financiamento de veículo", function () { userPicked("É financiamento de veículo", jurosResp); });
+      addChip("Empréstimo / consignado", function () { userPicked("É empréstimo ou consignado", jurosResp); });
+      addChip("Cartão / cheque especial", function () { userPicked("É cartão de crédito ou cheque especial", jurosResp); });
+      addChip("Financiamento imobiliário", function () { userPicked("É financiamento imobiliário", jurosResp); });
     });
   }
   function jurosResp() {
     botSay([
-      "Nesses contratos é comum encontrar: <strong>juros acima da média do mercado</strong>, capitalização (juros sobre juros) indevida, tarifas de cadastro e seguros que você nem pediu.",
-      "Com uma <strong>revisão do contrato</strong>, muitas vezes é possível <strong>reduzir a parcela</strong> e até <strong>recuperar valores pagos a mais</strong>.",
-      "Para saber quanto você pode economizar, o advogado precisa analisar o contrato. Posso te encaminhar agora?"
-    ], function () {
-      waChip("Olá! Vim pelo chatbot da JusCall. Quero uma REVISÃO por JUROS ABUSIVOS no meu contrato. Meu nome é: ");
-      menuChip();
-    });
+      "Nesses contratos é comum encontrar <strong>juros acima da média do mercado</strong>, capitalização indevida (juros sobre juros), tarifas de cadastro e seguros que você nem pediu.",
+      "Com a <strong>revisão do contrato</strong>, muitas vezes dá para <strong>reduzir a parcela</strong> e até <strong>recuperar valores pagos a mais</strong>.",
+      "Para calcular quanto você pode economizar, o advogado precisa analisar o contrato. Como posso te ajudar?"
+    ], function () { infoMenu(JUROS); });
   }
 
-  // --- Carro / busca e apreensão ---
   function carroStart() {
-    botSay([
-      "Vamos resolver isso com calma. 🚗 Me conta: em que situação você está?"
-    ], function () {
+    showFees._area = CARRO;
+    botSay([ "Vamos resolver isso com calma. 🚗 Em que situação você está?" ], function () {
       addChip("Estou atrasado nas parcelas", function () { userPicked("Estou atrasado nas parcelas", function(){ carroResp("atraso"); }); });
-      addChip("Recebi ação de busca e apreensão", function () { userPicked("Recebi uma ação de busca e apreensão", function(){ carroResp("acao"); }); });
+      addChip("Recebi busca e apreensão", function () { userPicked("Recebi uma ação de busca e apreensão", function(){ carroResp("acao"); }); });
       addChip("Meu carro já foi apreendido", function () { userPicked("Meu carro já foi apreendido", function(){ carroResp("apreendido"); }); });
     });
   }
   function carroResp(fase) {
     var m = {
-      atraso: "Ainda dá tempo de agir. É possível <strong>renegociar</strong> e evitar a ação. Se o contrato tiver juros abusivos, isso também pode ser usado a seu favor.",
-      acao: "Fique tranquilo, você tem direitos. Após ser citado, é possível fazer a <strong>purgação da mora</strong> (pagar o que está em atraso) e ficar com o veículo, dentro do prazo legal. Agir rápido é fundamental.",
+      atraso: "Ainda dá tempo de agir. É possível <strong>renegociar</strong> e evitar a ação. Se o contrato tiver juros abusivos, isso também joga a seu favor.",
+      acao: "Fique tranquilo, você tem direitos. Depois de citado, é possível fazer a <strong>purgação da mora</strong> (pagar o atraso) e ficar com o veículo, dentro do prazo legal. Agir rápido é fundamental.",
       apreendido: "Mesmo com o veículo apreendido ainda há caminhos: discutir o valor da dívida, apontar <strong>abusos no contrato</strong> e, em alguns casos, reaver o bem ou valores pagos. Precisamos ver os prazos com urgência."
     };
     botSay([
       m[fase],
-      "⏱️ Nesses casos o <strong>prazo é curto</strong> e faz toda a diferença. O melhor é falar com um advogado o quanto antes.",
-      "Quer que um advogado analise seu caso agora?"
-    ], function () {
-      waChip("Olá! Vim pelo chatbot da JusCall. Tenho um problema de FINANCIAMENTO/BUSCA E APREENSÃO do meu veículo (" + fase + "). Meu nome é: ");
-      menuChip();
-    });
+      "⏱️ Nesses casos o <strong>prazo é curto</strong> e faz toda a diferença. O ideal é falar com um advogado o quanto antes.",
+      "Como posso te ajudar?"
+    ], function () { infoMenu(CARRO); });
   }
 
   document.getElementById("restart").addEventListener("click", function () {
-    chat.innerHTML = "";
-    clearActions();
-    start();
+    chat.innerHTML = ""; clearActions(); start();
   });
 
   start();
